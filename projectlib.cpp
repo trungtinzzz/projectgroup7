@@ -76,11 +76,12 @@ void Login(bool &isSignUporLogined) {
     int loginResult;
     
     cout << "Username: ";
-    cin >> username;
+    cin.ignore(1000, '\n');
+    getline(cin, username);
     
     cout << "Password: ";
-    cin >> password;
-    
+    getline(cin, password);
+
     loginResult = _checkLogin(username, password);
     if (loginResult == 0) {
         cout << "Dang nhap thanh cong" << endl;
