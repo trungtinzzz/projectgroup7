@@ -13,5 +13,3 @@ struct TeacherAccount {
 };
 
 void startMenu(bool &isOff);
-void Login(bool &isSignUporLogined);
-void SignUp(bool &isSignUporLogined);
