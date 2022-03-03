@@ -51,9 +51,9 @@ int _checkLogin(const string &username, const string &password) {
     return -1;
 }
 
-bool _checkSignUp(const string &username, char choice) {
+bool _checkSignUp(const string &username, string choice) {
     string tmpUsername, fileName;
-    if (choice == '1')
+    if (choice[0] == '1')
         fileName = "teacherData.txt";
     else
         fileName = "studentData.txt";
@@ -97,7 +97,7 @@ void Login(bool &isSignUporLogined) {
 }
 
 void SignUp(bool &isSignUporLogined) {
-    char choice;
+    string choice;
     string username, password,fullname;
     cout << "Ban la giao vu hay hoc sinh?" << endl;
     do {
@@ -106,7 +106,7 @@ void SignUp(bool &isSignUporLogined) {
         cout << "Lua chon: ";
         cin >> choice;
     }
-    while (choice != '1' && choice != '2');
+    while ((choice[0] != '1' && choice[0] != '2') || choice.size() >= 2);
     
     cout << "Username: ";
     cin.ignore(1000, '\n');
@@ -126,14 +126,14 @@ void SignUp(bool &isSignUporLogined) {
         }
         cout << "Ten cua ban la: ";
         getline(cin, fullname);
-        if (choice == '1') {
+        if (choice[0] == '1') {
             ofstream outFile("teacherData.txt", ios::app);
             outFile << username << endl;
             outFile << password << endl;
             outFile << fullname << endl;
             outFile.close();
         } 
-        else if (choice == '2') {
+        else if (choice[0] == '2') {
             ofstream outFile("studentData.txt", ios::app);
             outFile << username << endl;
             outFile << password << endl;

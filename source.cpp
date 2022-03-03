@@ -4,7 +4,7 @@
 using namespace std;
 
 int main() {
-    char choice;
+    string choice;
     cout << " -------------------- " << endl;
     cout << "|   GROUP 7 MOODLE   |" << endl;
     cout << " -------------------- " << endl;
@@ -16,9 +16,9 @@ int main() {
             cout << "Lua chon: ";
             cin >> choice;
         }
-        while (choice != '1' && choice != '2');
+        while ((choice[0] != '1' && choice[0] != '2') || choice.size() >= 2);
 
-        if (choice == '1') {
+        if (choice[0] == '1') {
             SignUp(isSignUporLogined);
         }
         else {
