@@ -12,5 +12,6 @@ struct TeacherAccount {
     std::string fullName;
 };
 
+void startMenu();
 void Login(bool &isSignUporLogined);
 void SignUp(bool &isSignUporLogined);
