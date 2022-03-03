@@ -1,9 +1,9 @@
-#include <iostream>
-#include <fstream>
 #include "projectlib.h"
-using namespace std;
 
 int main() {
-    startMenu();
+    bool isOff = false;
+    while (!isOff) {
+        startMenu(isOff);
+    }
     return 0;
 }

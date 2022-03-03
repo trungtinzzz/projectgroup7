@@ -3,6 +3,12 @@
 #include <fstream>
 using namespace std;
 
+void _printGroupLogo() {
+    cout << " -------------------- " << endl;
+    cout << "|   GROUP 7 MOODLE   |" << endl;
+    cout << " -------------------- " << endl;
+}
+
 bool _checkSpace(string cstr) {
     for (int i = 0; i < cstr.size(); i++) {
         if (cstr[i] == ' ')
@@ -71,26 +77,28 @@ bool _checkSignUp(const string &username, string choice) {
     return true;
 }
 
-void startMenu() {
+void startMenu(bool &isOff) {
     string choice;
-    cout << " -------------------- " << endl;
-    cout << "|   GROUP 7 MOODLE   |" << endl;
-    cout << " -------------------- " << endl;
+    _printGroupLogo();
     bool isSignUporLogined = false;
     while (!isSignUporLogined) {
         cout << "1. Dang ky\t\t";
-        cout << "2. Dang nhap" << endl;
+        cout << "2. Dang nhap\t\t";
+        cout << "0. Quit" << endl;
         do {
             cout << "Lua chon: ";
             cin >> choice;
         }
-        while ((choice[0] != '1' && choice[0] != '2') || choice.size() >= 2);
+        while ((choice[0] != '1' && choice[0] != '2' && choice[0] != '0') || choice.size() >= 2);
 
         if (choice[0] == '1') {
             SignUp(isSignUporLogined);
         }
-        else {
+        else if (choice[0] == '2') {
             Login(isSignUporLogined);
+        }
+        else if (choice[0] == '0') {
+            isOff = true;
         }
     }
 }
@@ -117,7 +125,6 @@ void Login(bool &isSignUporLogined) {
     else if (loginResult == -1) {
         cout << "Tai khoan khong ton tai" << endl;
     }
-    
 }
 
 void SignUp(bool &isSignUporLogined) {
