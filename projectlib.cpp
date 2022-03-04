@@ -9,7 +9,7 @@ void _printGroupLogo() {
     cout << " -------------------- " << endl;
 }
 
-bool _checkSpace(string cstr) {
+bool _checkSpace(const string &cstr) {
     for (int i = 0; i < cstr.size(); i++) {
         if (cstr[i] == ' ')
             return false;
@@ -19,7 +19,7 @@ bool _checkSpace(string cstr) {
 } 
 
 int _checkLogin(const string &username, const string &password) {
-    ifstream inFile("teacherData.txt");
+    ifstream inFile("staffData.txt");
     string tmpUsername, tmpPassword;
     while (!inFile.eof()) {
         inFile >> tmpUsername;
@@ -32,7 +32,7 @@ int _checkLogin(const string &username, const string &password) {
             }
             else {
                 inFile.close();
-                return 1;
+                return -1;
             }
         }
     }
@@ -45,19 +45,19 @@ int _checkLogin(const string &username, const string &password) {
         if (username.compare(tmpUsername) == 0) {
             if (password.compare(tmpPassword) == 0) {
                 inFile.close();
-                return 0;
+                return 1;
             }
             else {
                 inFile.close();
-                return 1;
+                return -1;
             }
         }
     }
     inFile.close();
-    return -1;
+    return -2;
 }
 
-bool _checkSignUp(const string &username, string choice) {
+bool _checkSignUp(const string &username, const string &choice) {
     string tmpUsername, fileName;
     if (choice[0] == '1')
         fileName = "teacherData.txt";
@@ -77,7 +77,43 @@ bool _checkSignUp(const string &username, string choice) {
     return true;
 }
 
-void _login() {
+void staffMenu(bool &isOff) {
+    cout << " -------------------- " << endl;
+    cout << "|     STAFF MENU     |" << endl;
+    cout << " -------------------- " << endl;
+    string choice;
+    cout << "0. Quit\t\t";
+    // Add option here
+    cout << endl;
+    do {
+        cout << "Your choice: ";
+        cin >> choice;
+    } while (choice[0] != '0' || choice.size() >= 2);
+    // Add function below this;
+    if (choice[0] == '0') {
+        isOff = true;
+    }
+}
+
+void studentMenu(bool &isOff) {
+    cout << " -------------------- " << endl;
+    cout << "|    STUDENT MENU    |" << endl;
+    cout << " -------------------- " << endl;
+    string choice;
+    cout << "0. Quit\t\t";
+    // Add option here
+    cout << endl;
+    do {
+        cout << "Your choice: ";
+        cin >> choice;
+    } while (choice[0] != '0' || choice.size() >= 2);
+    // Add function below this;
+    if (choice[0] == '0') {
+        isOff = true;
+    }
+}
+
+void _login(bool &isOff) {
     string username, password;
     int loginResult;
     
@@ -90,24 +126,29 @@ void _login() {
 
     loginResult = _checkLogin(username, password);
     if (loginResult == 0) {
-        cout << "Dang nhap thanh cong" << endl;
+        cout << "Login successfully" << endl;
+        staffMenu(isOff);
     }
     else if (loginResult == 1) {
-        cout << "Mat khau khong dung" << endl;
+        cout << "Login successfully" << endl;
+        studentMenu(isOff);
     }
     else if (loginResult == -1) {
-        cout << "Tai khoan khong ton tai" << endl;
+        cout << "Incorrect password" << endl;
+    }
+    else if (loginResult == -2) {
+        cout << "Account does not exist" << endl;
     }
 }
 
 void _signUp() {
     string choice;
     string username, password,fullname;
-    cout << "Ban la giao vu hay hoc sinh?" << endl;
+    cout << "Are you academic staff or student?" << endl;
     do {
-        cout << "1. Giao vu\t\t";
-        cout << "2. Hoc sinh" << endl;
-        cout << "Lua chon: ";
+        cout << "1. Academic\t\t";
+        cout << "2. Student" << endl;
+        cout << "Your choice: ";
         cin >> choice;
     }
     while ((choice[0] != '1' && choice[0] != '2') || choice.size() >= 2);
@@ -116,7 +157,7 @@ void _signUp() {
     cin.ignore(1000, '\n');
     getline(cin, username);
     while (!_checkSpace(username)) {
-        cout << "Khong duoc co khoang trang" << endl;
+        cout << "Space is not accepted" << endl;
         cout << "Username: ";
         getline(cin, username);
     }
@@ -124,14 +165,14 @@ void _signUp() {
         cout << "Passord: ";
         getline(cin, password);
         while (!_checkSpace(password)) {
-            cout << "Khong duoc co khoang trang" << endl;
+            cout << "Space is not accepted" << endl;
             cout << "Password: ";
             getline(cin, password);
         }
-        cout << "Ten cua ban la: ";
+        cout << "Your name: ";
         getline(cin, fullname);
         if (choice[0] == '1') {
-            ofstream outFile("teacherData.txt", ios::app);
+            ofstream outFile("staffData.txt", ios::app);
             outFile << username << endl;
             outFile << password << endl;
             outFile << fullname << endl;
@@ -144,10 +185,10 @@ void _signUp() {
             outFile << fullname << endl;
             outFile.close();
         }
-        cout << "Dang ky thanh cong" << endl;
+        cout << "Sign up successfully" << endl;
     }
     else {
-        cout << "Tai khoan da ton tai" << endl;
+        cout << "Account already existed" << endl;
     }
 }
 
@@ -155,11 +196,11 @@ void startMenu(bool &isOff) {
     string choice;
     _printGroupLogo();
     
-    cout << "1. Dang ky\t\t";
-    cout << "2. Dang nhap\t\t";
-    cout << "0. Quit" << endl;
+    cout << "0. Quit\t\t";
+    cout << "1. Sign up\t\t";
+    cout << "2. Log in\t\t" << endl;
     do {
-        cout << "Lua chon: ";
+        cout << "Your choice: ";
         cin >> choice;
     }
     while ((choice[0] != '1' && choice[0] != '2' && choice[0] != '0') || choice.size() >= 2);
@@ -168,7 +209,7 @@ void startMenu(bool &isOff) {
         _signUp();
     }
     else if (choice[0] == '2') {
-        _login();
+        _login(isOff);
     }
     else {
         isOff = true;

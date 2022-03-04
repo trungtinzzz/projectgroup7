@@ -1,12 +1,12 @@
 #include <string>
 
-struct StudentAccount {
+struct StudentInfor {
     std::string username;
     std::string password;
     std::string fullName;
 };
 
-struct TeacherAccount {
+struct StaffInfor {
     std::string username;
     std::string password;
     std::string fullName;
