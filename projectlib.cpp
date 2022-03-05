@@ -88,11 +88,11 @@ void staffMenu(bool &isOff) {
     do {
         cout << "Your choice: ";
         cin >> choice;
-    } while (choice[0] != '0' || choice.size() >= 2);
+    } while (choice[0] != '0'|| choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
         isOff = true;
-    }
+    } 
 }
 
 void studentMenu(bool &isOff) {
@@ -110,7 +110,7 @@ void studentMenu(bool &isOff) {
     // Add function below this;
     if (choice[0] == '0') {
         isOff = true;
-    }
+    } 
 }
 
 void _login(bool &isOff) {
