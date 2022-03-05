@@ -60,7 +60,7 @@ int _checkLogin(const string &username, const string &password) {
 bool _checkSignUp(const string &username, const string &choice) {
     string tmpUsername, fileName;
     if (choice[0] == '1')
-        fileName = "teacherData.txt";
+        fileName = "staffData.txt";
     else
         fileName = "studentData.txt";
     ifstream inFile(fileName);
