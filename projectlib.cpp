@@ -26,7 +26,9 @@ int _checkLogin(const string &username, const string &password) {
     string tmpUsername, tmpPassword;
     while (!inFile.eof()) {
         inFile >> tmpUsername;
+        inFile.ignore();
         inFile >> tmpPassword;
+        inFile.ignore();
         inFile.ignore(1000, '\n');
         if (username.compare(tmpUsername) == 0) {
             if (password.compare(tmpPassword) == 0) {
@@ -43,7 +45,9 @@ int _checkLogin(const string &username, const string &password) {
     inFile.open("studentData.txt");
     while (!inFile.eof()) {
         inFile >> tmpUsername;
+        inFile.ignore();
         inFile >> tmpPassword;
+        inFile.ignore();
         inFile.ignore(1000, '\n');
         if (username.compare(tmpUsername) == 0) {
             if (password.compare(tmpPassword) == 0) {
@@ -60,15 +64,14 @@ int _checkLogin(const string &username, const string &password) {
     return -2;
 }
 
-bool _checkSignUp(const string &username, const string &choice) {
-    string tmpUsername, fileName;
-    if (choice[0] == '1')
-        fileName = "staffData.txt";
-    else
-        fileName = "studentData.txt";
-    ifstream inFile(fileName);
+bool _checkSignUp(const string &username) {
+    string tmpUsername;
+    ifstream inFile;
+
+    inFile.open("studentData.txt");
     while (!inFile.eof()) {
         inFile >> tmpUsername;
+        inFile.ignore();
         inFile.ignore(1000, '\n');
         inFile.ignore(1000, '\n');
         if (username.compare(tmpUsername) == 0) {
@@ -77,6 +80,20 @@ bool _checkSignUp(const string &username, const string &choice) {
         }
     }
     inFile.close();
+
+    inFile.open("staffData.txt");
+    while (!inFile.eof()) {
+        inFile >> tmpUsername;
+        inFile.ignore();
+        inFile.ignore(1000, '\n');
+        inFile.ignore(1000, '\n');
+        if (username.compare(tmpUsername) == 0) {
+            inFile.close();
+            return false;
+        }
+    }
+    inFile.close();
+
     return true;
 }
 
@@ -251,10 +268,10 @@ void staffMenu(bool &isOff) {
     cout << "|     STAFF MENU     |" << endl;
     cout << " -------------------- " << endl;
     string choice;
-    cout << "0. Quit\t\t";
+    cout << "0. Sign out\t\t";
     // Add option here
     cout << "1. Create school year\t\t";
-    cout << "2. Create 1st-year class\t\t";
+    cout << "2. Create 1st-year class" << endl;
     cout << "3. Add new 1st-year students to 1st-year class\t\t";
     cout << "4. Display list of students\t\t";
     cout << endl;
@@ -264,7 +281,7 @@ void staffMenu(bool &isOff) {
     } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4') || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
-        isOff = true;
+        startMenu(isOff);
     } else if (choice[0] == '1') {
         // Create school year
         createSchoolYear(schoolYear);
@@ -285,7 +302,7 @@ void studentMenu(bool &isOff) {
     cout << "|    STUDENT MENU    |" << endl;
     cout << " -------------------- " << endl;
     string choice;
-    cout << "0. Quit\t\t";
+    cout << "0. Sign out\t\t";
     // Add option here
     cout << endl;
     do {
@@ -294,7 +311,7 @@ void studentMenu(bool &isOff) {
     } while (choice[0] != '0' || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
-        isOff = true;
+        startMenu(isOff);
     } 
 }
 
@@ -346,7 +363,7 @@ void _signUp() {
         cout << "Username: ";
         getline(cin, username);
     }
-    if (_checkSignUp(username, choice)) {
+    if (_checkSignUp(username)) {
         cout << "Passord: ";
         getline(cin, password);
         while (!_checkSpace(password)) {
@@ -358,16 +375,18 @@ void _signUp() {
         getline(cin, fullname);
         if (choice[0] == '1') {
             ofstream outFile("staffData.txt", ios::app);
+            outFile << endl;
             outFile << username << endl;
             outFile << password << endl;
-            outFile << fullname << endl;
+            outFile << fullname << static_cast<char>(8);
             outFile.close();
         } 
         else if (choice[0] == '2') {
             ofstream outFile("studentData.txt", ios::app);
+            outFile << endl;
             outFile << username << endl;
             outFile << password << endl;
-            outFile << fullname << endl;
+            outFile << fullname << static_cast<char>(8);
             outFile.close();
         }
         cout << "Sign up successfully" << endl;
