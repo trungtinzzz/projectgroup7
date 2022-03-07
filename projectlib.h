@@ -1,13 +1,21 @@
-#ifndef PROJLIB_H
-#define PROJLIB_H
-
+#include <string>
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <vector>
 #include <sstream>
 using namespace std;
+struct StudentInfor {
+    std::string username;
+    std::string password;
+    std::string fullName;
+};
 
+struct StaffInfor {
+    std::string username;
+    std::string password;
+    std::string fullName;
+};
 struct SchoolYear {
     int begin, end;
 };
@@ -27,7 +35,6 @@ struct DNodeStudent {
         Student data;
         DNodeStudent* pNext, *pPrev;
 };
-
 struct DNodeClass {
     string className;
     DNodeStudent *StudentList;
@@ -43,4 +50,4 @@ void createSchoolYear(DNodeSYear* &schoolYear);
 void createClass(DNodeClass* &newClasses);
 void addStudent(DNodeClass* &newClasses);
 
-#endif
+void startMenu(bool &isOff);
