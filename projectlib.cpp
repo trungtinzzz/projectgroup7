@@ -215,6 +215,10 @@ void createSchoolYear(DNodeSYear* &schoolYear) {
     cout << "Enter year end: ";
     cin >> x.end;
 
+    ofstream outFile("schoolYear.txt", ios::app);
+    outFile << x.begin << " " << x.end << endl;
+    outFile.close();
+
     AddYearAtTail(schoolYear, x);
     cout << "Create school year successfully!\n\n";
 }
@@ -227,6 +231,10 @@ void createClass(DNodeClass* &newClasses) {
     cout << "Enter class name: \n";
     cin.ignore(1000, '\n');
     getline(cin, className);
+
+    ofstream outFile("firstYearClasses.txt", ios::app);
+    outFile << className << endl;
+    outFile.close();
 
     AddClassAtTail(newClasses, className);
     cout << "Create class " << className << " successfully!\n\n";
