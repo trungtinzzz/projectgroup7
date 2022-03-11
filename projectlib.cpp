@@ -97,6 +97,23 @@ bool _checkSignUp(const string &username) {
     return true;
 }
 
+bool _checkCreatedClass(string className) {
+    string tmpClass;
+    ifstream inFile;
+
+    inFile.open("firstYearClasses.txt");
+    while (!inFile.eof()) {
+        getline(inFile, tmpClass);
+        cout << tmpClass << endl;
+        if (className.compare(tmpClass) == 0) {
+            inFile.close();
+            return true;
+        }
+    }
+    inFile.close();
+    return false;
+}
+
 void AddYearAtTail(DNodeSYear* &pHead, SchoolYear x) {
     DNodeSYear* pNew = new DNodeSYear;
     DNodeSYear* pTail = pHead;
@@ -231,6 +248,11 @@ void createClass(DNodeClass* &newClasses) {
     cout << "Enter class name: \n";
     cin.ignore(1000, '\n');
     getline(cin, className);
+
+    if (_checkCreatedClass(className)) {
+        cout << "Class already existed!" << endl;
+        return;
+    }
 
     ofstream outFile("firstYearClasses.txt", ios::app);
     outFile << className << endl;
