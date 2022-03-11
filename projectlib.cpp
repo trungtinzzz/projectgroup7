@@ -97,6 +97,22 @@ bool _checkSignUp(const string &username) {
     return true;
 }
 
+bool _checkCreatedYear(int begin, int end) {
+    int tmpBegin, tmpEnd;
+    ifstream inFile;
+
+    inFile.open("schoolYear.txt");
+    while (!inFile.eof()) {
+        inFile >> tmpBegin >> tmpEnd;
+        if (begin == tmpBegin && end == tmpEnd) {
+            inFile.close();
+            return true;
+        }
+    }
+    inFile.close();
+    return false;
+}
+
 bool _checkCreatedClass(string className) {
     string tmpClass;
     ifstream inFile;
@@ -230,6 +246,11 @@ void createSchoolYear(DNodeSYear* &schoolYear) {
     cin >> x.begin;
     cout << "Enter year end: ";
     cin >> x.end;
+
+    if (_checkCreatedYear(x.begin, x.end)) {
+        cout << "School year already existed!" << endl;
+        return;
+    }
 
     ofstream outFile("schoolYear.txt", ios::app);
     outFile << x.begin << " " << x.end << endl;
