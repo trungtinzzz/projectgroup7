@@ -104,7 +104,6 @@ bool _checkCreatedClass(string className) {
     inFile.open("firstYearClasses.txt");
     while (!inFile.eof()) {
         getline(inFile, tmpClass);
-        cout << tmpClass << endl;
         if (className.compare(tmpClass) == 0) {
             inFile.close();
             return true;
