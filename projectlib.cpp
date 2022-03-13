@@ -257,7 +257,7 @@ void createSchoolYear(DNodeSYear* &schoolYear) {
     outFile.close();
 
     AddYearAtTail(schoolYear, x);
-    cout << "Create school year successfully!\n\n";
+    cout << "Create school year successfully!\n";
 }
 
 void createClass(DNodeClass* &newClasses) {
@@ -279,7 +279,7 @@ void createClass(DNodeClass* &newClasses) {
     outFile.close();
 
     AddClassAtTail(newClasses, className);
-    cout << "Create class " << className << " successfully!\n\n";
+    cout << "Create class " << className << " successfully!\n";
 }
 
 void addStudent(DNodeClass* &newClasses) {
@@ -292,11 +292,11 @@ void addStudent(DNodeClass* &newClasses) {
     getline(cin, className);
 
     if (AddStudentToClass(newClasses, className) == false) 
-        cout << "Class doesn't exist. Enter again!\n\n";
-    else cout << "Add students to class " << className << " successfully!\n\n";
+        cout << "Class doesn't exist. Enter again!\n";
+    else cout << "Add students to class " << className << " successfully!\n";
 }
 
-void displayList(DNodeClass* newClasses) {
+/* void displayList(DNodeClass* newClasses) {
     DNodeClass* pCur = newClasses;
     while (pCur != NULL) {
         cout << "Class: " << pCur->className << endl;
@@ -311,6 +311,24 @@ void displayList(DNodeClass* newClasses) {
         cout << endl;
         pCur = pCur->pNext;
     }
+} */
+
+void displayList() {
+    ifstream inFile("studentList.txt");
+    while (!inFile.eof()) {
+        string className;
+        getline(cin, className);
+        cout << "Class " << className << ": " << endl;
+        if (inFile.eof()) break;
+        string inforStudent;
+        getline(cin, inforStudent);
+        while (!inFile.eof() && inforStudent != "\n") {
+            cout << inforStudent << endl;
+            if (inFile.eof()) break;
+            getline(cin, inforStudent);
+        }
+    }
+    inFile.close();
 }
 
 void staffMenu(bool &isOff) {
@@ -332,6 +350,7 @@ void staffMenu(bool &isOff) {
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
+        return;
     } else if (choice[0] == '1') {
         // Create school year
         createSchoolYear(schoolYear);
@@ -343,8 +362,9 @@ void staffMenu(bool &isOff) {
         addStudent(newClasses);
     } else if (choice[0] == '4') {
         // Display list of student
-        displayList(newClasses);
+        displayList();
     }
+    staffMenu(isOff);
 }
 
 void studentMenu(bool &isOff) {
@@ -362,6 +382,7 @@ void studentMenu(bool &isOff) {
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
+        return;
     } 
 }
 
