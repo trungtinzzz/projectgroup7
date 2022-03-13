@@ -26,9 +26,8 @@ struct DNodeSYear {
 };
 
 struct Student {
-    int No, StudentID;
-    string FName, LName, Gender, DoB;
-    int SocialID;
+    int No;
+    string StudentID, FName, LName, Gender, DoB, SocialID;
 };
 
 struct DNodeStudent {
