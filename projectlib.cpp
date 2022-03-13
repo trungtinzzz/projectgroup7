@@ -99,9 +99,7 @@ bool _checkSignUp(const string &username) {
 
 bool _checkCreatedYear(int begin, int end) {
     int tmpBegin, tmpEnd;
-    ifstream inFile;
-
-    inFile.open("schoolYear.txt");
+    ifstream inFile("schoolYear.txt");
     while (!inFile.eof()) {
         inFile >> tmpBegin >> tmpEnd;
         if (begin == tmpBegin && end == tmpEnd) {
@@ -115,11 +113,10 @@ bool _checkCreatedYear(int begin, int end) {
 
 bool _checkCreatedClass(string className) {
     string tmpClass;
-    ifstream inFile;
-
-    inFile.open("firstYearClasses.txt");
+    ifstream inFile("firstYearClasses.txt");
     while (!inFile.eof()) {
-        getline(inFile, tmpClass);
+        inFile >> tmpClass;
+        inFile.ignore();
         if (className.compare(tmpClass) == 0) {
             inFile.close();
             return true;
@@ -219,20 +216,28 @@ bool AddStudentToClass(DNodeClass* &pHead, string className) {
     }
     else cout << "Could not open the file\n";
 
+    ofstream outFile;
+    outFile.open("studentList.txt");
+    outFile << className << endl;
+
     pCur->StudentList = new DNodeStudent;
     pCur->StudentList = NULL;
     for(int i = 0; i < content.size(); i++) {
         Student tmp;
         tmp.No = stoi(content[i][0], 0, 10);
-        tmp.StudentID = stoi(content[i][1], 0, 10);
+        tmp.StudentID = content[i][1];
         tmp.FName = content[i][2];
         tmp.LName = content[i][3];
         tmp.Gender = content[i][4];
         tmp.DoB = content[i][5];
-        tmp.SocialID = stoi(content[i][6], 0, 10);
+        tmp.SocialID = content[i][6];
 
+        outFile << tmp.No << " " << tmp.StudentID << " " << tmp.FName << " "; 
+        outFile << tmp.LName << " " << tmp.Gender << " " << tmp.DoB << " " << tmp.SocialID << endl; 
         AddIn4Student(pCur->StudentList, tmp);
     }
+    outFile << endl;
+    outFile.close();
     return true;
 }
 
@@ -314,7 +319,8 @@ void addStudent(DNodeClass* &newClasses) {
 } */
 
 void displayList() {
-    ifstream inFile("studentList.txt");
+    ifstream inFile;
+    inFile.open("studentList.txt");
     while (!inFile.eof()) {
         string className;
         getline(inFile, className);
@@ -326,7 +332,7 @@ void displayList() {
         if (inFile.eof()) break;
         string inforStudent;
         getline(inFile, inforStudent);
-        while (!inFile.eof() && inforStudent != "\n") {
+        while (!inFile.eof() && !inforStudent.empty()) {
             cout << inforStudent << endl;
             if (inFile.eof()) break;
             getline(cin, inforStudent);
@@ -335,10 +341,22 @@ void displayList() {
     inFile.close();
 }
 
+void loadFileToLinkedList() {
+    // load file school year:
+    ifstream inFile();
+    // load file 1st-year classes:
+
+    // load file student list:
+
+}
+
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
     cout << " -------------------- " << endl;
+
+    loadFileToLinkedList();
+
     string choice;
     cout << "0. Sign out\t\t";
     // Add option here
