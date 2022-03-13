@@ -97,6 +97,38 @@ bool _checkSignUp(const string &username) {
     return true;
 }
 
+bool _checkCreatedYear(int begin, int end) {
+    int tmpBegin, tmpEnd;
+    ifstream inFile;
+
+    inFile.open("schoolYear.txt");
+    while (!inFile.eof()) {
+        inFile >> tmpBegin >> tmpEnd;
+        if (begin == tmpBegin && end == tmpEnd) {
+            inFile.close();
+            return true;
+        }
+    }
+    inFile.close();
+    return false;
+}
+
+bool _checkCreatedClass(string className) {
+    string tmpClass;
+    ifstream inFile;
+
+    inFile.open("firstYearClasses.txt");
+    while (!inFile.eof()) {
+        getline(inFile, tmpClass);
+        if (className.compare(tmpClass) == 0) {
+            inFile.close();
+            return true;
+        }
+    }
+    inFile.close();
+    return false;
+}
+
 void AddYearAtTail(DNodeSYear* &pHead, SchoolYear x) {
     DNodeSYear* pNew = new DNodeSYear;
     DNodeSYear* pTail = pHead;
@@ -215,6 +247,15 @@ void createSchoolYear(DNodeSYear* &schoolYear) {
     cout << "Enter year end: ";
     cin >> x.end;
 
+    if (_checkCreatedYear(x.begin, x.end)) {
+        cout << "School year already existed!" << endl;
+        return;
+    }
+
+    ofstream outFile("schoolYear.txt", ios::app);
+    outFile << x.begin << " " << x.end << endl;
+    outFile.close();
+
     AddYearAtTail(schoolYear, x);
     cout << "Create school year successfully!\n\n";
 }
@@ -227,6 +268,15 @@ void createClass(DNodeClass* &newClasses) {
     cout << "Enter class name: \n";
     cin.ignore(1000, '\n');
     getline(cin, className);
+
+    if (_checkCreatedClass(className)) {
+        cout << "Class already existed!" << endl;
+        return;
+    }
+
+    ofstream outFile("firstYearClasses.txt", ios::app);
+    outFile << className << endl;
+    outFile.close();
 
     AddClassAtTail(newClasses, className);
     cout << "Create class " << className << " successfully!\n\n";
