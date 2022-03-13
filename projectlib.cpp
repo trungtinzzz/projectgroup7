@@ -317,11 +317,15 @@ void displayList() {
     ifstream inFile("studentList.txt");
     while (!inFile.eof()) {
         string className;
-        getline(cin, className);
+        getline(inFile, className);
+        if (className.empty()) {
+            cout << "Student list is unavailable!" << endl;
+            break;
+        }
         cout << "Class " << className << ": " << endl;
         if (inFile.eof()) break;
         string inforStudent;
-        getline(cin, inforStudent);
+        getline(inFile, inforStudent);
         while (!inFile.eof() && inforStudent != "\n") {
             cout << inforStudent << endl;
             if (inFile.eof()) break;
