@@ -475,11 +475,11 @@ void _login(bool &isOff) {
 
     loginResult = _checkLogin(username, password);
     if (loginResult == 0) {
-        cout << "Login successfully\n" << endl;
+        cout << "Login successfully" << endl;
         staffMenu(isOff);
     }
     else if (loginResult == 1) {
-        cout << "Login successfully\n" << endl;
+        cout << "Login successfully" << endl;
         studentMenu(isOff);
     }
     else if (loginResult == -1) {
