@@ -238,6 +238,7 @@ int AddStudentToClass(DNodeClass* &pHead, string className) {
         outFile << tmp.LName << " " << tmp.Gender << " " << tmp.DoB << " " << tmp.SocialID << endl; 
         AddIn4Student(pCur->StudentList, tmp);
     }
+    outFile << -1 << endl;
     
     outFile.close();
     return 1;
@@ -328,6 +329,7 @@ void displayList() {
     while (!inFile.eof()) {
         string className;
         getline(inFile, className);
+        if (className.empty()) break;
         cout << "Class " << className << ": " << endl;
 
         DNodeClass* pCur = newClasses;
@@ -341,6 +343,9 @@ void displayList() {
             cout << inforStudent << endl;
             pNum = pNum->pNext;
         }
+        int endClass;
+        inFile >> endClass;
+        inFile.ignore();
     }
     inFile.close();
 }
@@ -380,10 +385,13 @@ void loadFileToLinkedList() {
             break;
         }
     
-        DNodeStudent* pNum = pCur->StudentList;
         Student tmp;
-        while (pNum != NULL) {
+        while (!inFile.eof()) {
             inFile >> tmp.No;
+            if (tmp.No == -1) { // end class
+                inFile.ignore();
+                break;
+            }
             inFile >> tmp.StudentID;
             inFile >> tmp.FName;
             inFile >> tmp.LName;
@@ -393,7 +401,6 @@ void loadFileToLinkedList() {
             AddIn4Student(pCur->StudentList, tmp);
 
             inFile.ignore();
-            pNum = pNum->pNext;
         }
     }
     inFile.close();
