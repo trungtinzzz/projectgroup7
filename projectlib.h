@@ -43,7 +43,7 @@ struct DNodeClass {
 void AddYearAtTail(DNodeSYear* &pHead, SchoolYear x);
 void AddClassAtTail(DNodeClass* &pHead, string className);
 void AddIn4Student(DNodeStudent* &pHead, Student x);
-bool AddStudentToClass(DNodeClass* &pHead, string className);
+int AddStudentToClass(DNodeClass* &pHead, string className);
 
 void createSchoolYear(DNodeSYear* &schoolYear);
 void createClass(DNodeClass* &newClasses);
