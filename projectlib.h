@@ -50,3 +50,4 @@ void createClass(DNodeClass* &newClasses);
 void addStudent(DNodeClass* &newClasses);
 
 void startMenu(bool &isOff);
+void loadFileToLinkedList();
