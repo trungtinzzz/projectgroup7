@@ -180,12 +180,12 @@ void AddIn4Student(DNodeStudent* &pHead, Student x) {
     pNew->pPrev = pTail;
 }
 
-bool AddStudentToClass(DNodeClass* &pHead, string className) {
+int AddStudentToClass(DNodeClass* &pHead, string className) {
     DNodeClass* pCur = pHead;
     while (pCur && pCur->className.compare(className) != 0) 
         pCur = pCur->pNext;
 
-    if (pCur == NULL) return false;
+    if (pCur == NULL) return 0;
 
     /* Import CSV file has form:
         No, Student ID, First name, Last name, Gender, Date of Birth, Social ID
@@ -214,10 +214,12 @@ bool AddStudentToClass(DNodeClass* &pHead, string className) {
             content.push_back(row);
         }
     }
-    else cout << "Could not open the file\n";
+    else {
+        cout << "Could not open the file\n";
+        return -1;
+    }
 
-    ofstream outFile;
-    outFile.open("studentList.txt");
+    ofstream outFile("studentList.txt", ios::app);
     outFile << className << endl;
 
     pCur->StudentList = new DNodeStudent;
@@ -236,9 +238,9 @@ bool AddStudentToClass(DNodeClass* &pHead, string className) {
         outFile << tmp.LName << " " << tmp.Gender << " " << tmp.DoB << " " << tmp.SocialID << endl; 
         AddIn4Student(pCur->StudentList, tmp);
     }
-    outFile << endl;
+    
     outFile.close();
-    return true;
+    return 1;
 }
 
 
@@ -296,9 +298,11 @@ void addStudent(DNodeClass* &newClasses) {
     string className;
     getline(cin, className);
 
-    if (AddStudentToClass(newClasses, className) == false) 
+    int tmp = AddStudentToClass(newClasses, className);
+    if (tmp == 0) 
         cout << "Class doesn't exist. Enter again!\n";
-    else cout << "Add students to class " << className << " successfully!\n";
+    else if (tmp == 1) 
+        cout << "Add students to class " << className << " successfully!\n";
 }
 
 /* void displayList(DNodeClass* newClasses) {
@@ -324,18 +328,18 @@ void displayList() {
     while (!inFile.eof()) {
         string className;
         getline(inFile, className);
-        if (className.empty()) {
-            cout << "Student list is unavailable!" << endl;
-            break;
-        }
         cout << "Class " << className << ": " << endl;
-        if (inFile.eof()) break;
+
+        DNodeClass* pCur = newClasses;
+        while (pCur && pCur->className.compare(className) != 0)
+            pCur = pCur->pNext;
+        
+        DNodeStudent* pNum = pCur->StudentList;
         string inforStudent;
-        getline(inFile, inforStudent);
-        while (!inFile.eof() && !inforStudent.empty()) {
+        while (pNum != NULL) {
+            getline(inFile, inforStudent);
             cout << inforStudent << endl;
-            if (inFile.eof()) break;
-            getline(cin, inforStudent);
+            pNum = pNum->pNext;
         }
     }
     inFile.close();
@@ -343,19 +347,62 @@ void displayList() {
 
 void loadFileToLinkedList() {
     // load file school year:
-    ifstream inFile();
+    ifstream inFile("schoolYear.txt");
+    SchoolYear tmp;
+    while (inFile >> tmp.begin && inFile >> tmp.end)
+        AddYearAtTail(schoolYear, tmp);
+    inFile.close();
+
     // load file 1st-year classes:
+    inFile.open("firstYearClasses.txt");
+    string tmpClass;
+    while (!inFile.eof()) {
+        inFile >> tmpClass;
+        inFile.ignore();
+        AddClassAtTail(newClasses, tmpClass);
+    }
+    inFile.close();
 
     // load file student list:
+    inFile.open("studentList.txt");
+    while (!inFile.eof()) {
+        getline(inFile, tmpClass);
+        if (tmpClass.empty()) {
+            inFile.close();
+            break;
+        }
 
+        DNodeClass* pCur = newClasses;
+        while (pCur && pCur->className.compare(tmpClass) != 0) 
+            pCur = pCur->pNext;
+        if (pCur == NULL) {
+            inFile.close();
+            break;
+        }
+    
+        DNodeStudent* pNum = pCur->StudentList;
+        Student tmp;
+        while (pNum != NULL) {
+            inFile >> tmp.No;
+            inFile >> tmp.StudentID;
+            inFile >> tmp.FName;
+            inFile >> tmp.LName;
+            inFile >> tmp.Gender;
+            inFile >> tmp.DoB;
+            inFile >> tmp.SocialID;
+            AddIn4Student(pCur->StudentList, tmp);
+
+            inFile.ignore();
+            pNum = pNum->pNext;
+        }
+    }
+    inFile.close();
 }
 
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
     cout << " -------------------- " << endl;
-
-    loadFileToLinkedList();
 
     string choice;
     cout << "0. Sign out\t\t";
