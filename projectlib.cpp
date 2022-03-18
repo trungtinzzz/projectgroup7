@@ -405,6 +405,30 @@ void loadFileToLinkedList() {
     }
     inFile.close();
 }
+void createSemester() {
+    cout << " --------------------------- " << endl;
+    cout << "|   CREATE NEW SEMESTER   |" << endl;
+    cout << " --------------------------- " << endl;
+    Semester s;
+    cout << "Enter the semester(1,2 or 3): ";
+    cin >> s.semester;
+    cout << "Enter start date: ";
+    cin >> s.startDate;
+    cout << "Enter end date : ";
+    cin >> s.endDate;
+    cout << "Choose school year: ";
+}
+
+void createCourse() {
+    cout << " --------------------------- " << endl;
+    cout << "|   CREATE NEW COURSE   |" << endl;
+    cout << " --------------------------- " << endl;
+    Course c;
+    cout << "Enter the start date of the course: ";
+    cin >> c.startDate;
+    cout << "Enter the end date of the course: ";
+    cin >> c.endDate;
+}
 
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
@@ -418,11 +442,13 @@ void staffMenu(bool &isOff) {
     cout << "2. Create 1st-year class" << endl;
     cout << "3. Add new 1st-year students to 1st-year class\t\t";
     cout << "4. Display list of students\t\t";
+    cout << "5. Create a semester\t\t";
+    cout << "6. Create a course\t\t";
     cout << endl;
     do {
         cout << "Your choice: ";
         cin >> choice;
-    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4') || choice.size() >= 2);
+    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5' && choice[0] != '6') || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
@@ -440,6 +466,12 @@ void staffMenu(bool &isOff) {
         // Display list of student
         displayList();
     }
+      else if (choice[0] == '5') {
+
+      }
+      else if (choice[0] != '6') {
+
+      }
     staffMenu(isOff);
 }
 
