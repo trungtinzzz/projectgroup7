@@ -6,15 +6,15 @@
 #include <sstream>
 using namespace std;
 struct StudentInfor {
-    std::string username;
-    std::string password;
-    std::string fullName;
+    string username;
+    string password;
+    string fullName;
 };
 
 struct StaffInfor {
-    std::string username;
-    std::string password;
-    std::string fullName;
+    string username;
+    string password;
+    string fullName;
 };
 struct SchoolYear {
     int begin, end;
