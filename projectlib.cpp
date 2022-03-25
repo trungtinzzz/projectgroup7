@@ -392,6 +392,66 @@ void loadFileToLinkedList() {
     }
     inFile.close();
 }
+void createSemester() {
+    cout << " --------------------------- " << endl;
+    cout << "|   CREATE NEW SEMESTER   |" << endl;
+    cout << " --------------------------- " << endl;
+    Semester s;
+    cout << "Enter the semester(1,2 or 3): ";
+    cin >> s.semester;
+    cout << "Enter start date: ";
+    cin >> s.startDate;
+    cout << "Enter end date : ";
+    cin >> s.endDate;
+    cout << "Choose school year: ";
+}
+
+void createCourse() {
+    cout << " --------------------------- " << endl;
+    cout << "|   CREATE NEW COURSE   |" << endl;
+    cout << " --------------------------- " << endl;
+    Course c;
+    cout << "Enter the start date of the course: ";
+    cin >> c.startDate;
+    cout << "Enter the end date of the course: ";
+    cin >> c.endDate;
+}
+void addCourse() {
+    ifstream in;
+    in.open("course.txt");
+    
+    cout << " --------------------------- " << endl;
+    cout << "|   ADD COURSE TO SEMESTER   |" << endl;
+    cout << " --------------------------- " << endl;
+    Course c;
+    cout << "Course ID: ";
+    getline(in,c.courseID);
+    cout << c.courseID << endl;
+    cout << "Course name: ";
+    getline(in,c.courseName);
+    cout << c.courseName << endl;
+    cout << "Teacher name: ";
+    getline(in,c.teacherName);
+    cout << c.teacherName << endl;
+    cout << "Credits: ";
+    getline(in,c.credits);
+    cout << c.credits << endl;
+    cout << "First day of the week: ";
+    getline(in,c.day1);
+    cout << c.day1 << endl;
+    cout << "Session: ";
+    getline(in,c.session1);
+    cout << c.session1 << endl;
+    cout << "Second day of the week: ";
+    getline(in,c.day2);
+    cout << c.day2 << endl;
+    cout << "Session: ";
+    getline(in,c.session2);
+    cout << c.session2 << endl;
+    cout << "Maximum number of students in a course: " << 50 << endl;
+    
+    in.close();
+}
 
 
 
@@ -407,11 +467,14 @@ void staffMenu(bool &isOff) {
     cout << "2. Create 1st-year class" << endl;
     cout << "3. Add new 1st-year students to 1st-year class\t\t";
     cout << "4. Display list of students\t\t";
-    cout << "5. Add semester to school year" << endl;
+    cout << "5. Create a semester\t\t";
+    cout << "6. Create a course registration session\t\t";
+    cout << "7. Add a course to the semester\t\t";
+    cout << endl;
     do {
         cout << "Your choice: ";
         cin >> choice;
-    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5') || choice.size() >= 2);
+    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5' && choice[0] != '6' && choice[0] != '7') || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
@@ -428,7 +491,16 @@ void staffMenu(bool &isOff) {
     } else if (choice[0] == '4') {
         // Display list of student
         displayList();
-    } 
+    }
+      else if (choice[0] == '5') {
+
+      }
+      else if (choice[0] == '6') {
+
+      }
+      else if (choice[0] == '7') {
+
+      }
     staffMenu(isOff);
 }
 

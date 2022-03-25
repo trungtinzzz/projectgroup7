@@ -40,6 +40,16 @@ struct DNodeClass {
     DNodeClass* pNext, *pPrev;
 };
 
+struct Semester {
+    int semester;
+    int startDate, endDate;
+};
+
+struct Course {
+    int startDate, endDate;
+    string courseID, courseName, teacherName, credits, day1, day2, session1, session2;
+};
+
 void AddYearAtTail(DNodeSYear* &pHead, SchoolYear x);
 void AddClassAtTail(DNodeClass* &pHead, string className);
 void AddIn4Student(DNodeStudent* &pHead, Student x);
