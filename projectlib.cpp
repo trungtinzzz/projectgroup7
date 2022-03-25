@@ -1,7 +1,6 @@
 #include "projectlib.h"
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 DNodeSYear *schoolYear = nullptr;
 DNodeClass *newClasses = nullptr;
@@ -22,16 +21,13 @@ bool _checkSpace(const string &cstr) {
 } 
 
 int _checkLogin(const string &username, const string &password) {
-    ifstream inFile("staffData.txt");
-    string tmpUsername, tmpPassword;
+    ifstream inFile("staffData.dat", ios::binary);
+    StaffInfor tmpStaff;
+    StudentInfor tmpStudent;
     while (!inFile.eof()) {
-        inFile >> tmpUsername;
-        inFile.ignore();
-        inFile >> tmpPassword;
-        inFile.ignore();
-        inFile.ignore(1000, '\n');
-        if (username.compare(tmpUsername) == 0) {
-            if (password.compare(tmpPassword) == 0) {
+        inFile.read(reinterpret_cast<char *>(&tmpStaff), sizeof(tmpStaff));
+        if (username.compare(tmpStaff.username) == 0) {
+            if (password.compare(tmpStaff.password) == 0) {
                 inFile.close();
                 return 0;
             }
@@ -42,15 +38,11 @@ int _checkLogin(const string &username, const string &password) {
         }
     }
     inFile.close();
-    inFile.open("studentData.txt");
+    inFile.open("studentData.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile >> tmpUsername;
-        inFile.ignore();
-        inFile >> tmpPassword;
-        inFile.ignore();
-        inFile.ignore(1000, '\n');
-        if (username.compare(tmpUsername) == 0) {
-            if (password.compare(tmpPassword) == 0) {
+        inFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
+        if (username.compare(tmpStudent.username) == 0) {
+            if (password.compare(tmpStudent.password) == 0) {
                 inFile.close();
                 return 1;
             }
@@ -65,29 +57,24 @@ int _checkLogin(const string &username, const string &password) {
 }
 
 bool _checkSignUp(const string &username) {
-    string tmpUsername;
+    StaffInfor tmpStaff;
+    StudentInfor tmpStudent;
     ifstream inFile;
 
-    inFile.open("studentData.txt");
+    inFile.open("studentData.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile >> tmpUsername;
-        inFile.ignore();
-        inFile.ignore(1000, '\n');
-        inFile.ignore(1000, '\n');
-        if (username.compare(tmpUsername) == 0) {
+        inFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
+        if (username.compare(tmpStudent.username) == 0) {
             inFile.close();
             return false;
         }
     }
     inFile.close();
 
-    inFile.open("staffData.txt");
+    inFile.open("staffData.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile >> tmpUsername;
-        inFile.ignore();
-        inFile.ignore(1000, '\n');
-        inFile.ignore(1000, '\n');
-        if (username.compare(tmpUsername) == 0) {
+        inFile.read(reinterpret_cast<char *>(&tmpStaff), sizeof(tmpStaff));
+        if (username.compare(tmpStaff.username) == 0) {
             inFile.close();
             return false;
         }
@@ -406,6 +393,8 @@ void loadFileToLinkedList() {
     inFile.close();
 }
 
+
+
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
@@ -418,11 +407,11 @@ void staffMenu(bool &isOff) {
     cout << "2. Create 1st-year class" << endl;
     cout << "3. Add new 1st-year students to 1st-year class\t\t";
     cout << "4. Display list of students\t\t";
-    cout << endl;
+    cout << "5. Add semester to school year" << endl;
     do {
         cout << "Your choice: ";
         cin >> choice;
-    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4') || choice.size() >= 2);
+    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5') || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
@@ -439,7 +428,7 @@ void staffMenu(bool &isOff) {
     } else if (choice[0] == '4') {
         // Display list of student
         displayList();
-    }
+    } 
     staffMenu(isOff);
 }
 
@@ -521,19 +510,21 @@ void _signUp() {
         cout << "Your name: ";
         getline(cin, fullname);
         if (choice[0] == '1') {
-            ofstream outFile("staffData.txt", ios::app);
-            outFile << endl;
-            outFile << username << endl;
-            outFile << password << endl;
-            outFile << fullname << static_cast<char>(8);
+            StaffInfor staff;
+            staff.username = username;
+            staff.password = password;
+            staff.fullName = fullname;
+            ofstream outFile("staffData.dat", ios::binary | ios::app);
+            outFile.write(reinterpret_cast<char *>(&staff), sizeof(staff));
             outFile.close();
         } 
         else if (choice[0] == '2') {
-            ofstream outFile("studentData.txt", ios::app);
-            outFile << endl;
-            outFile << username << endl;
-            outFile << password << endl;
-            outFile << fullname << static_cast<char>(8);
+            StudentInfor student;
+            student.username = username;
+            student.password = password;
+            student.fullName = fullname;
+            ofstream outFile("studentData.dat", ios::app);
+            outFile.write(reinterpret_cast<char *>(&student), sizeof(student));
             outFile.close();
         }
         cout << "Sign up successfully" << endl;
