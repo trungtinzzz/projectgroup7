@@ -17,7 +17,7 @@ bool _checkSpace(const string &cstr) {
             return false;
     }
 
-    return true;
+    return true; 
 } 
 
 int _checkLogin(const string &username, const string &password) {
@@ -96,7 +96,7 @@ bool _checkCreatedYear(int begin, int end) {
     }
     inFile.close();
     return false;
-}
+} 
 
 bool _checkCreatedClass(string className) {
     string tmpClass;
