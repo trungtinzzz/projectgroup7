@@ -615,27 +615,6 @@ void _signUp() {
     }
 }
 
-void startMenu(bool &isOff) {
-    string choice;
-    _printGroupLogo();
-    
-    cout << "0. Quit\t\t";
-    cout << "1. Sign up\t\t";
-    cout << "2. Log in\t\t" << endl;
-    do {
-        cout << "Your choice: ";
-        cin >> choice;
-    }
-    while ((choice[0] != '1' && choice[0] != '2' && choice[0] != '0') || choice.size() >= 2);
 
-    if (choice[0] == '1') {
-        _signUp();
-    }
-    else if (choice[0] == '2') {
-        _login(isOff);
-    }
-    else {
-        isOff = true;
-    }
 
 }
