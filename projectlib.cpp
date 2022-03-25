@@ -1,7 +1,6 @@
 #include "projectlib.h"
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 DNodeSYear *schoolYear = nullptr;
 DNodeClass *newClasses = nullptr;
@@ -22,16 +21,13 @@ bool _checkSpace(const string &cstr) {
 } 
 
 int _checkLogin(const string &username, const string &password) {
-    ifstream inFile("staffData.txt");
-    string tmpUsername, tmpPassword;
+    ifstream inFile("staffData.dat", ios::binary);
+    StaffInfor tmpStaff;
+    StudentInfor tmpStudent;
     while (!inFile.eof()) {
-        inFile >> tmpUsername;
-        inFile.ignore();
-        inFile >> tmpPassword;
-        inFile.ignore();
-        inFile.ignore(1000, '\n');
-        if (username.compare(tmpUsername) == 0) {
-            if (password.compare(tmpPassword) == 0) {
+        inFile.read(reinterpret_cast<char *>(&tmpStaff), sizeof(tmpStaff));
+        if (username.compare(tmpStaff.username) == 0) {
+            if (password.compare(tmpStaff.password) == 0) {
                 inFile.close();
                 return 0;
             }
@@ -42,15 +38,11 @@ int _checkLogin(const string &username, const string &password) {
         }
     }
     inFile.close();
-    inFile.open("studentData.txt");
+    inFile.open("studentData.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile >> tmpUsername;
-        inFile.ignore();
-        inFile >> tmpPassword;
-        inFile.ignore();
-        inFile.ignore(1000, '\n');
-        if (username.compare(tmpUsername) == 0) {
-            if (password.compare(tmpPassword) == 0) {
+        inFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
+        if (username.compare(tmpStudent.username) == 0) {
+            if (password.compare(tmpStudent.password) == 0) {
                 inFile.close();
                 return 1;
             }
@@ -65,29 +57,24 @@ int _checkLogin(const string &username, const string &password) {
 }
 
 bool _checkSignUp(const string &username) {
-    string tmpUsername;
+    StaffInfor tmpStaff;
+    StudentInfor tmpStudent;
     ifstream inFile;
 
-    inFile.open("studentData.txt");
+    inFile.open("studentData.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile >> tmpUsername;
-        inFile.ignore();
-        inFile.ignore(1000, '\n');
-        inFile.ignore(1000, '\n');
-        if (username.compare(tmpUsername) == 0) {
+        inFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
+        if (username.compare(tmpStudent.username) == 0) {
             inFile.close();
             return false;
         }
     }
     inFile.close();
 
-    inFile.open("staffData.txt");
+    inFile.open("staffData.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile >> tmpUsername;
-        inFile.ignore();
-        inFile.ignore(1000, '\n');
-        inFile.ignore(1000, '\n');
-        if (username.compare(tmpUsername) == 0) {
+        inFile.read(reinterpret_cast<char *>(&tmpStaff), sizeof(tmpStaff));
+        if (username.compare(tmpStaff.username) == 0) {
             inFile.close();
             return false;
         }
@@ -430,41 +417,52 @@ void createCourse() {
     cin >> c.endDate;
 }
 void addCourse() {
-    ifstream in;
-    in.open("course.txt");
+    ofstream out;
+    out.open("course.txt");
     
     cout << " --------------------------- " << endl;
     cout << "|   ADD COURSE TO SEMESTER   |" << endl;
     cout << " --------------------------- " << endl;
     Course c;
     cout << "Course ID: ";
-    getline(in,c.courseID);
-    cout << c.courseID << endl;
+    cin >> c.courseID;
+    cin.ignore();
     cout << "Course name: ";
-    getline(in,c.courseName);
-    cout << c.courseName << endl;
-    cout << "Teacher name: ";
-    getline(in,c.teacherName);
-    cout << c.teacherName << endl;
-    cout << "Credits: ";
-    getline(in,c.credits);
-    cout << c.credits << endl;
-    cout << "First day of the week: ";
-    getline(in,c.day1);
-    cout << c.day1 << endl;
-    cout << "Session: ";
-    getline(in,c.session1);
-    cout << c.session1 << endl;
-    cout << "Second day of the week: ";
-    getline(in,c.day2);
-    cout << c.day2 << endl;
-    cout << "Session: ";
-    getline(in,c.session2);
-    cout << c.session2 << endl;
-    cout << "Maximum number of students in a course: " << 50 << endl;
+    getline(cin,c.courseName);
     
-    in.close();
+    cout << "Teacher name: ";
+    getline(cin,c.teacherName);
+    
+    cout << "Credits: ";
+    cin >> c.credits;
+    cin.ignore();
+    
+    cout << "First day of the week: ";
+    getline(cin,c.day1);
+    
+    cout << "Session: ";
+    getline(cin,c.session1);
+    
+    cout << "Second day of the week: ";
+    getline(cin,c.day2);
+    
+    cout << "Session: ";
+    getline(cin,c.session2);
+    
+    out << c.courseID << endl;
+    out << c.courseName << endl;
+    out << c.teacherName << endl;
+    out << c.credits << endl;
+    out << c.day1 << endl;
+    out << c.session1 << endl;
+    out << c.day2 << endl;
+    out << c.session2 << endl;
+    out << 50 << endl;
+    
+    out.close();
 }
+
+
 
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
@@ -593,19 +591,21 @@ void _signUp() {
         cout << "Your name: ";
         getline(cin, fullname);
         if (choice[0] == '1') {
-            ofstream outFile("staffData.txt", ios::app);
-            outFile << endl;
-            outFile << username << endl;
-            outFile << password << endl;
-            outFile << fullname << static_cast<char>(8);
+            StaffInfor staff;
+            staff.username = username;
+            staff.password = password;
+            staff.fullName = fullname;
+            ofstream outFile("staffData.dat", ios::binary | ios::app);
+            outFile.write(reinterpret_cast<char *>(&staff), sizeof(staff));
             outFile.close();
         } 
         else if (choice[0] == '2') {
-            ofstream outFile("studentData.txt", ios::app);
-            outFile << endl;
-            outFile << username << endl;
-            outFile << password << endl;
-            outFile << fullname << static_cast<char>(8);
+            StudentInfor student;
+            student.username = username;
+            student.password = password;
+            student.fullName = fullname;
+            ofstream outFile("studentData.dat", ios::app);
+            outFile.write(reinterpret_cast<char *>(&student), sizeof(student));
             outFile.close();
         }
         cout << "Sign up successfully" << endl;
