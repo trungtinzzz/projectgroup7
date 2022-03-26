@@ -1,3 +1,6 @@
+#ifndef _PROJECTLIB_
+#define _PROJECTLIB_
+
 #include <string>
 #include <iostream>
 #include <string>
@@ -6,15 +9,15 @@
 #include <sstream>
 using namespace std;
 struct StudentInfor {
-    std::string username;
-    std::string password;
-    std::string fullName;
+    string username;
+    string password;
+    string fullName;
 };
 
 struct StaffInfor {
-    std::string username;
-    std::string password;
-    std::string fullName;
+    string username;
+    string password;
+    string fullName;
 };
 struct SchoolYear {
     int begin, end;
@@ -26,8 +29,7 @@ struct DNodeSYear {
 };
 
 struct Student {
-    int No;
-    string StudentID, FName, LName, Gender, DoB, SocialID;
+    string No, StudentID, FName, LName, Gender, DoB, SocialID;
 };
 
 struct DNodeStudent {
@@ -38,6 +40,16 @@ struct DNodeClass {
     string className;
     DNodeStudent *StudentList;
     DNodeClass* pNext, *pPrev;
+};
+
+struct Semester {
+    int semester;
+    int startDate, endDate;
+};
+
+struct Course {
+    int startDate, endDate;
+    string courseID, courseName, teacherName, credits, day1, day2, session1, session2;
 };
 
 void AddYearAtTail(DNodeSYear* &pHead, SchoolYear x);
@@ -51,3 +63,5 @@ void addStudent(DNodeClass* &newClasses);
 
 void startMenu(bool &isOff);
 void loadFileToLinkedList();
+
+#endif
