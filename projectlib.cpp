@@ -343,6 +343,7 @@ void loadFileToLinkedList() {
     SchoolYear tmp;
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmp.begin), sizeof(tmp.begin));
+        if (inFile.eof()) break;
         AddYearAtTail(schoolYear, tmp);
     }
         
@@ -353,6 +354,7 @@ void loadFileToLinkedList() {
     string tmpClass;
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmpClass), sizeof(tmpClass));
+        if (inFile.eof()) break;
         AddClassAtTail(newClasses, tmpClass);
     }
     inFile.close();
@@ -361,6 +363,7 @@ void loadFileToLinkedList() {
     inFile.open("studentList.dat", ios::binary);
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmpClass), sizeof(tmpClass));
+        if (inFile.eof()) break;
 
         DNodeClass* pCur = newClasses;
         while (pCur && pCur->className.compare(tmpClass) != 0) 
@@ -375,6 +378,8 @@ void loadFileToLinkedList() {
             inFile.read(reinterpret_cast<char*>(&tmp.Gender), sizeof(tmp.Gender));
             inFile.read(reinterpret_cast<char*>(&tmp.DoB), sizeof(tmp.DoB));
             inFile.read(reinterpret_cast<char*>(&tmp.SocialID), sizeof(tmp.SocialID));
+            if (inFile.eof()) break;
+
             AddIn4Student(pCur->StudentList, tmp);
         }
     }
