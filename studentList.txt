@@ -1,0 +1,10 @@
+21APCS
+1  21125123  No  Name  Male  01/01/2001  010101
+2  21125321  Anonymous  Hacker  Female  30/02/1999  000000
+-1
+21CLC01
+1  21127155  Fan  Quin  Female  08/06/2003  123456
+2  21127001  Gigi  Hadid  Female  23/04/1995  654321
+3  21127002  Zayn  Malik  Male  12/01/1993  162534
+4  21127003  Chi  Dan  Male  02/06/1989  615243
+-1

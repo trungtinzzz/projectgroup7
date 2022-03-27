@@ -467,7 +467,7 @@ void staffMenu(bool &isOff) {
     cout << "2. Create 1st-year class" << endl;
     cout << "3. Add new 1st-year students to 1st-year class\t\t";
     cout << "4. Display list of students\t\t";
-    cout << "5. Create a semester\t\t";
+    cout << "5. Create a semester" << endl;
     cout << "6. Create a course registration session\t\t";
     cout << "7. Add a course to the semester\t\t";
     cout << endl;
@@ -491,16 +491,13 @@ void staffMenu(bool &isOff) {
     } else if (choice[0] == '4') {
         // Display list of student
         displayList();
+    } else if (choice[0] == '5') {
+
+    } else if (choice[0] == '6') {
+
+    } else if (choice[0] == '7') {
+
     }
-      else if (choice[0] == '5') {
-
-      }
-      else if (choice[0] == '6') {
-
-      }
-      else if (choice[0] == '7') {
-
-      }
     staffMenu(isOff);
 }
 
