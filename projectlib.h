@@ -1,3 +1,6 @@
+#ifndef _PROJECTLIB_
+#define _PROJECTLIB_
+
 #include <string>
 #include <iostream>
 #include <string>
@@ -26,8 +29,7 @@ struct DNodeSYear {
 };
 
 struct Student {
-    int No;
-    string StudentID, FName, LName, Gender, DoB, SocialID;
+    string No, StudentID, FName, LName, Gender, DoB, SocialID;
 };
 
 struct DNodeStudent {
@@ -61,3 +63,5 @@ void addStudent(DNodeClass* &newClasses);
 
 void startMenu(bool &isOff);
 void loadFileToLinkedList();
+
+#endif

@@ -1,6 +1,4 @@
 #include "projectlib.h"
-#include <iostream>
-#include <fstream>
 
 DNodeSYear *schoolYear = nullptr;
 DNodeClass *newClasses = nullptr;
@@ -17,7 +15,7 @@ bool _checkSpace(const string &cstr) {
             return false;
     }
 
-    return true;
+    return true; 
 } 
 
 int _checkLogin(const string &username, const string &password) {
@@ -84,26 +82,25 @@ bool _checkSignUp(const string &username) {
     return true;
 }
 
-bool _checkCreatedYear(int begin, int end) {
-    int tmpBegin, tmpEnd;
-    ifstream inFile("schoolYear.txt");
+bool _checkCreatedYear(int begin) {
+    int tmpBegin;
+    ifstream inFile("schoolYear.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile >> tmpBegin >> tmpEnd;
-        if (begin == tmpBegin && end == tmpEnd) {
+        inFile.read(reinterpret_cast<char*>(&tmpBegin), sizeof(tmpBegin));
+        if (begin == tmpBegin) {
             inFile.close();
             return true;
         }
     }
     inFile.close();
     return false;
-}
+} 
 
 bool _checkCreatedClass(string className) {
     string tmpClass;
-    ifstream inFile("firstYearClasses.txt");
+    ifstream inFile("firstYearClasses.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile >> tmpClass;
-        inFile.ignore();
+        inFile.read(reinterpret_cast<char*>(&tmpClass), sizeof(tmpClass));
         if (className.compare(tmpClass) == 0) {
             inFile.close();
             return true;
@@ -171,7 +168,7 @@ int AddStudentToClass(DNodeClass* &pHead, string className) {
     DNodeClass* pCur = pHead;
     while (pCur && pCur->className.compare(className) != 0) 
         pCur = pCur->pNext;
-
+    
     if (pCur == NULL) return 0;
 
     /* Import CSV file has form:
@@ -185,20 +182,26 @@ int AddStudentToClass(DNodeClass* &pHead, string className) {
     cout << "Enter the file name: ";
     cin >> fileName;
     
-    vector< vector<string> > content;
-    vector<string> row;
+    // vector< vector<string> > content;
+    // vector<string> row;
+    string data[1000][7];
     string line, word;
 
     fstream file(fileName, ios::in);
+    int n = 0;
     if (file.is_open()) {
         while (getline(file, line)) {
-            row.clear();
-
+            // row.clear();
             stringstream str(line);
 
-            while (getline(str, word, ','))
-                row.push_back(word);
-            content.push_back(row);
+            int j = 0;
+            while (getline(str, word, ',')) {
+                data[n][j] = word;
+                j++;
+            }
+                // row.push_back(word);
+            // content.push_back(row);
+            n++;
         }
     }
     else {
@@ -206,26 +209,33 @@ int AddStudentToClass(DNodeClass* &pHead, string className) {
         return -1;
     }
 
-    ofstream outFile("studentList.txt", ios::app);
-    outFile << className << endl;
+    ofstream outFile("studentList.dat", ios::app | ios::binary);
+    outFile.write(reinterpret_cast<char*>(&className), sizeof(className));
 
     pCur->StudentList = new DNodeStudent;
     pCur->StudentList = NULL;
-    for(int i = 0; i < content.size(); i++) {
+    for(int i = 0; i < n; i++) {
         Student tmp;
-        tmp.No = stoi(content[i][0], 0, 10);
-        tmp.StudentID = content[i][1];
-        tmp.FName = content[i][2];
-        tmp.LName = content[i][3];
-        tmp.Gender = content[i][4];
-        tmp.DoB = content[i][5];
-        tmp.SocialID = content[i][6];
+        tmp.No = data[i][0];
+        tmp.StudentID = data[i][1];
+        tmp.FName = data[i][2];
+        tmp.LName = data[i][3];
+        tmp.Gender = data[i][4];
+        tmp.DoB = data[i][5];
+        tmp.SocialID = data[i][6];
 
-        outFile << tmp.No << " " << tmp.StudentID << " " << tmp.FName << " "; 
-        outFile << tmp.LName << " " << tmp.Gender << " " << tmp.DoB << " " << tmp.SocialID << endl; 
+        cout << tmp.No << " " << tmp.StudentID << " " << tmp.FName << " ";
+        cout << tmp.LName << " " << tmp.Gender << " " << tmp.DoB << " " << tmp.SocialID << endl;
+
+        outFile.write(reinterpret_cast<char*>(&tmp.No), sizeof(tmp.No));
+        outFile.write(reinterpret_cast<char*>(&tmp.StudentID), sizeof(tmp.StudentID));
+        outFile.write(reinterpret_cast<char*>(&tmp.FName), sizeof(tmp.FName));
+        outFile.write(reinterpret_cast<char*>(&tmp.LName), sizeof(tmp.LName));
+        outFile.write(reinterpret_cast<char*>(&tmp.Gender), sizeof(tmp.Gender));
+        outFile.write(reinterpret_cast<char*>(&tmp.DoB), sizeof(tmp.DoB));
+        outFile.write(reinterpret_cast<char*>(&tmp.SocialID), sizeof(tmp.SocialID));
         AddIn4Student(pCur->StudentList, tmp);
     }
-    outFile << -1 << endl;
     
     outFile.close();
     return 1;
@@ -239,16 +249,14 @@ void createSchoolYear(DNodeSYear* &schoolYear) {
     SchoolYear x;
     cout << "Enter year begin: ";
     cin >> x.begin;
-    cout << "Enter year end: ";
-    cin >> x.end;
 
-    if (_checkCreatedYear(x.begin, x.end)) {
+    if (_checkCreatedYear(x.begin)) {
         cout << "School year already existed!" << endl;
         return;
     }
 
-    ofstream outFile("schoolYear.txt", ios::app);
-    outFile << x.begin << " " << x.end << endl;
+    ofstream outFile("schoolYear.dat", ios::app | ios::binary);
+    outFile.write(reinterpret_cast<char*>(&x.begin), sizeof(x.begin));
     outFile.close();
 
     AddYearAtTail(schoolYear, x);
@@ -269,8 +277,8 @@ void createClass(DNodeClass* &newClasses) {
         return;
     }
 
-    ofstream outFile("firstYearClasses.txt", ios::app);
-    outFile << className << endl;
+    ofstream outFile("firstYearClasses.dat", ios::app | ios::binary);
+    outFile.write(reinterpret_cast<char*>(&className), sizeof(className));
     outFile.close();
 
     AddClassAtTail(newClasses, className);
@@ -281,9 +289,10 @@ void addStudent(DNodeClass* &newClasses) {
     cout << " --------------------------- " << endl;
     cout << "|   ADD 1ST YEAR STUDENTS   |" << endl;
     cout << " --------------------------- " << endl;
-    cout << "Which class do you want to add students to?\n";
-    cin.ignore(1000, '\n');
+
     string className;
+    cout << "Which class do you want to add students to?" << endl;
+    cin.ignore(1000, '\n');
     getline(cin, className);
 
     int tmp = AddStudentToClass(newClasses, className);
@@ -311,83 +320,67 @@ void addStudent(DNodeClass* &newClasses) {
 } */
 
 void displayList() {
-    ifstream inFile;
-    inFile.open("studentList.txt");
-    while (!inFile.eof()) {
-        string className;
-        getline(inFile, className);
-        if (className.empty()) break;
-        cout << "Class " << className << ": " << endl;
+    DNodeClass* pCur = newClasses;
+    if (pCur == nullptr) cout << "No class!" << endl;
 
-        DNodeClass* pCur = newClasses;
-        while (pCur && pCur->className.compare(className) != 0)
-            pCur = pCur->pNext;
-        
+    while (pCur) {
+        cout << "Class " << pCur->className << ": " << endl;
+
         DNodeStudent* pNum = pCur->StudentList;
-        string inforStudent;
+        if (pNum == nullptr) cout << "\tNo student!" << endl;
         while (pNum != NULL) {
-            getline(inFile, inforStudent);
-            cout << inforStudent << endl;
+            cout << "\t" << pNum->data.No << " " << pNum->data.StudentID << " " << pNum->data.FName << " ";
+            cout << pNum->data.LName << " " << pNum->data.Gender << " " << pNum->data.DoB << " " << pNum->data.SocialID << endl;
             pNum = pNum->pNext;
         }
-        int endClass;
-        inFile >> endClass;
-        inFile.ignore();
+        pCur = pCur->pNext;
     }
-    inFile.close();
 }
 
 void loadFileToLinkedList() {
     // load file school year:
-    ifstream inFile("schoolYear.txt");
+    ifstream inFile("schoolYear.dat", ios::binary);
     SchoolYear tmp;
-    while (inFile >> tmp.begin && inFile >> tmp.end)
+    while (!inFile.eof()) {
+        inFile.read(reinterpret_cast<char*>(&tmp.begin), sizeof(tmp.begin));
+        if (inFile.eof()) break;
         AddYearAtTail(schoolYear, tmp);
+    }
+        
     inFile.close();
 
     // load file 1st-year classes:
-    inFile.open("firstYearClasses.txt");
+    inFile.open("firstYearClasses.dat", ios::binary);
     string tmpClass;
     while (!inFile.eof()) {
-        inFile >> tmpClass;
-        inFile.ignore();
+        inFile.read(reinterpret_cast<char*>(&tmpClass), sizeof(tmpClass));
+        if (inFile.eof()) break;
         AddClassAtTail(newClasses, tmpClass);
     }
     inFile.close();
 
     // load file student list:
-    inFile.open("studentList.txt");
+    inFile.open("studentList.dat", ios::binary);
     while (!inFile.eof()) {
-        getline(inFile, tmpClass);
-        if (tmpClass.empty()) {
-            inFile.close();
-            break;
-        }
+        inFile.read(reinterpret_cast<char*>(&tmpClass), sizeof(tmpClass));
+        if (inFile.eof()) break;
 
         DNodeClass* pCur = newClasses;
         while (pCur && pCur->className.compare(tmpClass) != 0) 
             pCur = pCur->pNext;
-        if (pCur == NULL) {
-            inFile.close();
-            break;
-        }
     
         Student tmp;
         while (!inFile.eof()) {
-            inFile >> tmp.No;
-            if (tmp.No == -1) { // end class
-                inFile.ignore();
-                break;
-            }
-            inFile >> tmp.StudentID;
-            inFile >> tmp.FName;
-            inFile >> tmp.LName;
-            inFile >> tmp.Gender;
-            inFile >> tmp.DoB;
-            inFile >> tmp.SocialID;
-            AddIn4Student(pCur->StudentList, tmp);
+            inFile.read(reinterpret_cast<char*>(&tmp.No), sizeof(tmp.No));
+            inFile.read(reinterpret_cast<char*>(&tmp.StudentID), sizeof(tmp.StudentID));
+            inFile.read(reinterpret_cast<char*>(&tmp.FName), sizeof(tmp.FName));
+            inFile.read(reinterpret_cast<char*>(&tmp.LName), sizeof(tmp.LName));
+            inFile.read(reinterpret_cast<char*>(&tmp.Gender), sizeof(tmp.Gender));
+            inFile.read(reinterpret_cast<char*>(&tmp.DoB), sizeof(tmp.DoB));
+            inFile.read(reinterpret_cast<char*>(&tmp.SocialID), sizeof(tmp.SocialID));
+            if (inFile.eof()) break;
 
-            inFile.ignore();
+            AddIn4Student(pCur->StudentList, tmp);
         }
     }
     inFile.close();
@@ -408,7 +401,7 @@ void createSemester() {
 
 void createCourse() {
     cout << " --------------------------- " << endl;
-    cout << "|   CREATE NEW COURSE   |" << endl;
+    cout << "|     CREATE NEW COURSE     |" << endl;
     cout << " --------------------------- " << endl;
     Course c;
     cout << "Enter the start date of the course: ";
@@ -417,40 +410,49 @@ void createCourse() {
     cin >> c.endDate;
 }
 void addCourse() {
-    ifstream in;
-    in.open("course.txt");
+    ofstream out;
+    out.open("course.dat");
     
     cout << " --------------------------- " << endl;
     cout << "|   ADD COURSE TO SEMESTER   |" << endl;
     cout << " --------------------------- " << endl;
     Course c;
     cout << "Course ID: ";
-    getline(in,c.courseID);
-    cout << c.courseID << endl;
+    cin >> c.courseID;
+    cin.ignore();
     cout << "Course name: ";
-    getline(in,c.courseName);
-    cout << c.courseName << endl;
-    cout << "Teacher name: ";
-    getline(in,c.teacherName);
-    cout << c.teacherName << endl;
-    cout << "Credits: ";
-    getline(in,c.credits);
-    cout << c.credits << endl;
-    cout << "First day of the week: ";
-    getline(in,c.day1);
-    cout << c.day1 << endl;
-    cout << "Session: ";
-    getline(in,c.session1);
-    cout << c.session1 << endl;
-    cout << "Second day of the week: ";
-    getline(in,c.day2);
-    cout << c.day2 << endl;
-    cout << "Session: ";
-    getline(in,c.session2);
-    cout << c.session2 << endl;
-    cout << "Maximum number of students in a course: " << 50 << endl;
+    getline(cin,c.courseName);
     
-    in.close();
+    cout << "Teacher name: ";
+    getline(cin,c.teacherName);
+    
+    cout << "Credits: ";
+    cin >> c.credits;
+    cin.ignore();
+    
+    cout << "First day of the week: ";
+    getline(cin,c.day1);
+    
+    cout << "Session: ";
+    getline(cin,c.session1);
+    
+    cout << "Second day of the week: ";
+    getline(cin,c.day2);
+    
+    cout << "Session: ";
+    getline(cin,c.session2);
+    
+    out << c.courseID << endl;
+    out << c.courseName << endl;
+    out << c.teacherName << endl;
+    out << c.credits << endl;
+    out << c.day1 << endl;
+    out << c.session1 << endl;
+    out << c.day2 << endl;
+    out << c.session2 << endl;
+    out << 50 << endl;
+    
+    out.close();
 }
 
 
@@ -507,12 +509,15 @@ void studentMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     string choice;
     cout << "0. Sign out\t\t";
+    cout << "1. Enroll in a course\t\t";
+    cout << "3. View the list of enrolled courses\t\t";
+    cout << "4. Remove a course from enrolled list\t\t";
     // Add option here
     cout << endl;
     do {
         cout << "Your choice: ";
         cin >> choice;
-    } while (choice[0] != '0' || choice.size() >= 2);
+    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4') || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
