@@ -224,16 +224,7 @@ int AddStudentToClass(DNodeClass* &pHead, string className) {
         tmp.DoB = data[i][5];
         tmp.SocialID = data[i][6];
 
-        cout << tmp.No << " " << tmp.StudentID << " " << tmp.FName << " ";
-        cout << tmp.LName << " " << tmp.Gender << " " << tmp.DoB << " " << tmp.SocialID << endl;
-
-        outFile.write(reinterpret_cast<char*>(&tmp.No), sizeof(tmp.No));
-        outFile.write(reinterpret_cast<char*>(&tmp.StudentID), sizeof(tmp.StudentID));
-        outFile.write(reinterpret_cast<char*>(&tmp.FName), sizeof(tmp.FName));
-        outFile.write(reinterpret_cast<char*>(&tmp.LName), sizeof(tmp.LName));
-        outFile.write(reinterpret_cast<char*>(&tmp.Gender), sizeof(tmp.Gender));
-        outFile.write(reinterpret_cast<char*>(&tmp.DoB), sizeof(tmp.DoB));
-        outFile.write(reinterpret_cast<char*>(&tmp.SocialID), sizeof(tmp.SocialID));
+        outFile.write(reinterpret_cast<char*>(&tmp), sizeof(tmp));
         AddIn4Student(pCur->StudentList, tmp);
     }
     
@@ -371,13 +362,7 @@ void loadFileToLinkedList() {
     
         Student tmp;
         while (!inFile.eof()) {
-            inFile.read(reinterpret_cast<char*>(&tmp.No), sizeof(tmp.No));
-            inFile.read(reinterpret_cast<char*>(&tmp.StudentID), sizeof(tmp.StudentID));
-            inFile.read(reinterpret_cast<char*>(&tmp.FName), sizeof(tmp.FName));
-            inFile.read(reinterpret_cast<char*>(&tmp.LName), sizeof(tmp.LName));
-            inFile.read(reinterpret_cast<char*>(&tmp.Gender), sizeof(tmp.Gender));
-            inFile.read(reinterpret_cast<char*>(&tmp.DoB), sizeof(tmp.DoB));
-            inFile.read(reinterpret_cast<char*>(&tmp.SocialID), sizeof(tmp.SocialID));
+            inFile.read(reinterpret_cast<char*>(&tmp), sizeof(tmp));
             if (inFile.eof()) break;
 
             AddIn4Student(pCur->StudentList, tmp);
