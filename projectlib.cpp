@@ -83,11 +83,11 @@ bool _checkSignUp(const string &username) {
 }
 
 bool _checkCreatedYear(int begin) {
-    int tmpBegin;
+    SchoolYear tmp;
     ifstream inFile("schoolYear.dat", ios::binary);
     while (!inFile.eof()) {
-        inFile.read(reinterpret_cast<char*>(&tmpBegin), sizeof(tmpBegin));
-        if (begin == tmpBegin) {
+        inFile.read(reinterpret_cast<char*>(&tmp), sizeof(tmp));
+        if (begin == tmp.begin) {
             inFile.close();
             return true;
         }
@@ -240,14 +240,14 @@ void createSchoolYear(DNodeSYear* &schoolYear) {
     SchoolYear x;
     cout << "Enter year begin: ";
     cin >> x.begin;
-
+    x.end = x.begin + 1;
     if (_checkCreatedYear(x.begin)) {
         cout << "School year already existed!" << endl;
         return;
     }
 
     ofstream outFile("schoolYear.dat", ios::app | ios::binary);
-    outFile.write(reinterpret_cast<char*>(&x.begin), sizeof(x.begin));
+    outFile.write(reinterpret_cast<char*>(&x), sizeof(x));
     outFile.close();
 
     AddYearAtTail(schoolYear, x);
@@ -333,8 +333,9 @@ void loadFileToLinkedList() {
     ifstream inFile("schoolYear.dat", ios::binary);
     SchoolYear tmp;
     while (!inFile.eof()) {
-        inFile.read(reinterpret_cast<char*>(&tmp.begin), sizeof(tmp.begin));
-        if (inFile.eof()) break;
+        inFile.read(reinterpret_cast<char*>(&tmp), sizeof(tmp));
+        if (inFile.eof())
+            break;
         AddYearAtTail(schoolYear, tmp);
     }
         
@@ -345,7 +346,8 @@ void loadFileToLinkedList() {
     string tmpClass;
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmpClass), sizeof(tmpClass));
-        if (inFile.eof()) break;
+        if (inFile.eof())
+            break;
         AddClassAtTail(newClasses, tmpClass);
     }
     inFile.close();
@@ -370,77 +372,166 @@ void loadFileToLinkedList() {
     }
     inFile.close();
 }
+
+bool _checkAlreadyCreatedYear(SchoolYearLinkedList *pHead, int begin, SchoolYearLinkedList *&theChosen) {
+    SchoolYearLinkedList *pRead = pHead;
+    while (pRead != nullptr) {
+        if (pRead->data.begin == begin) {
+            theChosen = pRead;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool _checkCourseRegistration(CourseRegistration course) {
+    if (course.start.year > course.end.year || course.start.year <= 0 || course.end.year <= 0) {
+        return false;
+    } else if (course.start.month > course.end.month || course.start.month <=0 || course.end.month <= 0) {
+        return false;
+    } else if (course.start.date > course.end.date || course.start.date <=0 || course.end.date <=0) {
+        return false;
+    }
+    return true;
+}
+
+void addCourseRegistrationSession() {
+    CourseRegistration tmp;
+    string tmpStartDate, tmpStartMonth, tmpStartYear, tmpEndDate, tmpEndMonth, tmpEndYear;
+    bool inputGood = false;
+    cout << "Add course registration session";
+    do {
+        cout << "Start" << endl;
+        cout << "Year: ";
+        cin >> tmpStartYear;
+        cout << "Month: ";
+        cin >> tmpStartMonth;
+        cout << "Date: ";
+        cin >> tmpStartDate;
+        cout << "End" << endl;
+        cout << "Year: ";
+        cin >> tmpEndYear;
+        cout << "Month: ";
+        cin >> tmpEndMonth;
+        cout << "Date: ";
+        cin >> tmpEndDate;
+        try {
+            tmp.start.year = stoi(tmpStartYear);
+            tmp.start.month = stoi(tmpStartMonth);
+            tmp.start.date = stoi(tmpStartDate);
+            tmp.end.year = stoi(tmpEndYear);
+            tmp.end.month = stoi(tmpEndMonth);
+            tmp.end.date = stoi(tmpEndDate);
+            inputGood = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!inputGood || !_checkCourseRegistration(tmp));
+}
+
 void createSemester() {
-    cout << " --------------------------- " << endl;
-    cout << "|   CREATE NEW SEMESTER   |" << endl;
-    cout << " --------------------------- " << endl;
-    Semester s;
-    cout << "Enter the semester(1,2 or 3): ";
-    cin >> s.semester;
-    cout << "Enter start date: ";
-    cin >> s.startDate;
-    cout << "Enter end date : ";
-    cin >> s.endDate;
-    cout << "Choose school year: ";
-}
+    cout << "List of school years created:" << endl;
+    SchoolYearLinkedList *pHead = nullptr;
+    SchoolYearLinkedList *pRead = pHead;
+    SchoolYearLinkedList *pNew = nullptr;
+    SchoolYear tmp;
+    ifstream inFile("schoolYear.dat", ios::binary);
+    while (!inFile.eof()) {
+        inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+        if (inFile.eof())
+            break;
+        if (pHead == nullptr) {
+            pHead = new SchoolYearLinkedList;
+            pHead->pPrev = nullptr;
+            pHead->data = tmp;
+            pHead->pNext = nullptr;
+            pRead = pHead;
+        } else {
+            pNew = new SchoolYearLinkedList;
+            pNew->data = tmp;
+            pNew->pPrev = pRead;
+            pNew->pNext = nullptr;
+            pRead->pNext = pNew;
+            pRead = pNew;
+        }
+    }
+    
+    if (pHead == nullptr) {
+        cout << "There are no school years created" << endl;
+        return;
+    } 
 
-void createCourse() {
-    cout << " --------------------------- " << endl;
-    cout << "|     CREATE NEW COURSE     |" << endl;
-    cout << " --------------------------- " << endl;
-    Course c;
-    cout << "Enter the start date of the course: ";
-    cin >> c.startDate;
-    cout << "Enter the end date of the course: ";
-    cin >> c.endDate;
-}
-void addCourse() {
-    ofstream out;
-    out.open("course.dat");
-    
-    cout << " --------------------------- " << endl;
-    cout << "|   ADD COURSE TO SEMESTER   |" << endl;
-    cout << " --------------------------- " << endl;
-    Course c;
-    cout << "Course ID: ";
-    cin >> c.courseID;
-    cin.ignore();
-    cout << "Course name: ";
-    getline(cin,c.courseName);
-    
-    cout << "Teacher name: ";
-    getline(cin,c.teacherName);
-    
-    cout << "Credits: ";
-    cin >> c.credits;
-    cin.ignore();
-    
-    cout << "First day of the week: ";
-    getline(cin,c.day1);
-    
-    cout << "Session: ";
-    getline(cin,c.session1);
-    
-    cout << "Second day of the week: ";
-    getline(cin,c.day2);
-    
-    cout << "Session: ";
-    getline(cin,c.session2);
-    
-    out << c.courseID << endl;
-    out << c.courseName << endl;
-    out << c.teacherName << endl;
-    out << c.credits << endl;
-    out << c.day1 << endl;
-    out << c.session1 << endl;
-    out << c.day2 << endl;
-    out << c.session2 << endl;
-    out << 50 << endl;
-    
-    out.close();
-}
+    pRead = pHead;
+    while (pRead != nullptr) {
+        cout << pRead->data.begin << " " << pRead->data.end << endl;
+        pRead = pRead->pNext;
+    }
 
+    string choiceStr;
+    int choice;
+    bool inputGood = false;
+    while(!inputGood) {
+        try {
+            cout << "Choose your school years (Type begin year only): ";
+            cin >> choiceStr;
+            choice = stoi(choiceStr);
+            inputGood = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    }
 
+    SchoolYearLinkedList *theChosen;
+    
+    if (!_checkAlreadyCreatedYear(pHead, choice, theChosen)) {
+        cout << "That school year is not created" << endl;
+        return;
+    } else if (theChosen->data.sems[0] == true && theChosen->data.sems[1] == true && theChosen->data.sems[2] == true) {
+        cout << "All semesters of this school year are created" << endl;
+        return;
+    } else {
+        cout << "What semester do you want to create 1, 2 or 3: ";
+        string semChoice;
+        do {
+            cin >> semChoice;
+        } while (semChoice[0] != '1' && semChoice[0] != '2' && semChoice[0] != '3' || semChoice.size() >= 2); 
+
+        bool checkEmptySem = false;
+        while (!checkEmptySem) {
+            if (semChoice[0] == '1') {
+                if (theChosen->data.sems[0] == true) {
+                    cout << "It is already created" << endl;
+                }
+                else {
+                    checkEmptySem = true;
+                    theChosen->data.sems[0] = true;
+                }
+            } else if (semChoice[0] == '2') {                
+                if (theChosen->data.sems[1] == true) {
+                    cout << "It is already created" << endl;
+                }
+                else {
+                    checkEmptySem = true;
+                    theChosen->data.sems[1] = true;
+                }
+            } else {
+                if (theChosen->data.sems[2] == true) {
+                    cout << "It is already created" << endl;
+                }
+                else {
+                    checkEmptySem = true;
+                    theChosen->data.sems[2] = true;
+                }
+            }
+        }
+        cout << "Semester is successfully created" << endl;
+    }
+    while (pHead != nullptr) {
+        pRead = pHead;
+        pHead = pHead->pNext;
+        delete pRead;
+    }
+}
 
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
@@ -479,7 +570,7 @@ void staffMenu(bool &isOff) {
         // Display list of student
         displayList();
     } else if (choice[0] == '5') {
-
+        createSemester();
     } else if (choice[0] == '6') {
 
     } else if (choice[0] == '7') {

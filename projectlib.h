@@ -19,8 +19,32 @@ struct StaffInfor {
     string password;
     string fullName;
 };
+
+struct Date {
+    int year;
+    int month;
+    int date;
+};
+
+struct CourseRegistration {
+    Date start;
+    Date end;
+};
+
+struct Semester {
+
+};
+
 struct SchoolYear {
     int begin, end;
+    bool sems[3] = {false, false, false};
+    Semester semesters[3];
+};
+
+struct SchoolYearLinkedList {
+    SchoolYearLinkedList *pPrev;
+    SchoolYear data;
+    SchoolYearLinkedList *pNext;
 };
 
 struct DNodeSYear {
@@ -40,11 +64,6 @@ struct DNodeClass {
     string className;
     DNodeStudent *StudentList;
     DNodeClass* pNext, *pPrev;
-};
-
-struct Semester {
-    int semester;
-    int startDate, endDate;
 };
 
 struct Course {
