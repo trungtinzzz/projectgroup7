@@ -535,6 +535,8 @@ void createSemester() {
         pRead = pRead->pNext;
     }
 
+    outFile.close();
+
     while (pHead != nullptr) {
         pRead = pHead;
         pHead = pHead->pNext;
