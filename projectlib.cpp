@@ -526,6 +526,15 @@ void createSemester() {
         }
         cout << "Semester is successfully created" << endl;
     }
+    inFile.close();
+    
+    ofstream outFile("schoolYear.dat", ios::binary | ios::out);
+    pRead = pHead;
+    while (pRead != nullptr) {
+        outFile.write(reinterpret_cast<char *>(&pRead->data), sizeof(pRead->data));
+        pRead = pRead->pNext;
+    }
+
     while (pHead != nullptr) {
         pRead = pHead;
         pHead = pHead->pNext;
