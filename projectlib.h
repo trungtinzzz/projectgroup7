@@ -47,23 +47,15 @@ struct SchoolYearLinkedList {
     SchoolYearLinkedList *pNext;
 };
 
-struct DNodeSYear {
-    SchoolYear data;
-    DNodeSYear* pNext, *pPrev;
-};
-
 struct Student {
     string No, StudentID, FName, LName, Gender, DoB, SocialID;
 };
 
-struct DNodeStudent {
-        Student data;
-        DNodeStudent* pNext, *pPrev;
-};
-struct DNodeClass {
-    string className;
-    DNodeStudent *StudentList;
-    DNodeClass* pNext, *pPrev;
+
+
+struct StudentLinkedList {
+    Student data;
+    StudentLinkedList* pNext, *pPrev;
 };
 
 struct Course {
@@ -71,16 +63,17 @@ struct Course {
     string courseID, courseName, teacherName, credits, day1, day2, session1, session2;
 };
 
-void AddYearAtTail(DNodeSYear* &pHead, SchoolYear x);
-void AddClassAtTail(DNodeClass* &pHead, string className);
-void AddIn4Student(DNodeStudent* &pHead, Student x);
-int AddStudentToClass(DNodeClass* &pHead, string className);
+void AddYearAtTail(SchoolYearLinkedList* &pHead, SchoolYear x);
+void AddIn4Student(StudentLinkedList* &pHead, Student x);
+//int AddStudentToClass(ClassLinkedList* &pHead, string className);
 
-void createSchoolYear(DNodeSYear* &schoolYear);
-void createClass(DNodeClass* &newClasses);
-void addStudent(DNodeClass* &newClasses);
+void createSchoolYear();
+void createClass();
+void addStudent();
 
 void startMenu(bool &isOff);
-void loadFileToLinkedList();
+
+void DeallocateSchoolYear(SchoolYearLinkedList* &pHead);
+void DeallocateStudent(StudentLinkedList* &pHead);
 
 #endif
