@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <iomanip>
 using namespace std;
 struct StudentInfor {
     string username;
@@ -27,18 +28,15 @@ struct Date {
 };
 
 struct CourseRegistration {
+    int schoolyear;
+    int semester;
     Date start;
     Date end;
-};
-
-struct Semester {
-
 };
 
 struct SchoolYear {
     int begin, end;
     bool sems[3] = {false, false, false};
-    Semester semesters[3];
 };
 
 struct SchoolYearLinkedList {
@@ -47,25 +45,24 @@ struct SchoolYearLinkedList {
     SchoolYearLinkedList *pNext;
 };
 
+struct Course {
+    int schoolyearBegin;
+    int semester;
+    string courseID, courseName, teacherName;
+    int credits, maxStudent;
+    string day1, day2;
+    string session1, session2;
+};
+
 struct Student {
     string No, StudentID, FName, LName, Gender, DoB, SocialID;
 };
-
 
 
 struct StudentLinkedList {
     Student data;
     StudentLinkedList* pNext, *pPrev;
 };
-
-struct Course {
-    int startDate, endDate;
-    string courseID, courseName, teacherName, credits, day1, day2, session1, session2;
-};
-
-void AddYearAtTail(SchoolYearLinkedList* &pHead, SchoolYear x);
-void AddIn4Student(StudentLinkedList* &pHead, Student x);
-//int AddStudentToClass(ClassLinkedList* &pHead, string className);
 
 void createSchoolYear();
 void createClass();

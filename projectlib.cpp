@@ -260,6 +260,7 @@ bool _checkAlreadyCreatedYear(SchoolYearLinkedList *pHead, int begin, SchoolYear
             theChosen = pRead;
             return true;
         }
+        pRead = pRead->pNext;
     }
     return false;
 }
@@ -275,11 +276,11 @@ bool _checkCourseRegistration(CourseRegistration course) {
     return true;
 }
 
-void addCourseRegistrationSession() {
+void addCourseRegistrationSession(SchoolYear schoolyear, int semester) {
     CourseRegistration tmp;
     string tmpStartDate, tmpStartMonth, tmpStartYear, tmpEndDate, tmpEndMonth, tmpEndYear;
     bool inputGood = false;
-    cout << "Add course registration session";
+    cout << "Add course registration session" << endl;
     do {
         cout << "Start" << endl;
         cout << "Year: ";
@@ -288,6 +289,7 @@ void addCourseRegistrationSession() {
         cin >> tmpStartMonth;
         cout << "Date: ";
         cin >> tmpStartDate;
+        cout << "----------" << endl;
         cout << "End" << endl;
         cout << "Year: ";
         cin >> tmpEndYear;
@@ -302,11 +304,195 @@ void addCourseRegistrationSession() {
             tmp.end.year = stoi(tmpEndYear);
             tmp.end.month = stoi(tmpEndMonth);
             tmp.end.date = stoi(tmpEndDate);
-            inputGood = true;
+            if (_checkCourseRegistration(tmp))
+                inputGood = true;
+            else 
+                cout << "Invalid input (End date must later than start date)" << endl;
         } catch (...) {
             cout << "Invalid input" << endl;
         }
     } while (!inputGood || !_checkCourseRegistration(tmp));
+    tmp.schoolyear = schoolyear.begin;
+    tmp.semester = semester;
+    ofstream outFile("sessions.dat", ios::binary | ios::app);
+    outFile.write(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+    outFile.close();
+}
+
+void addCourse(SchoolYear schoolyear, int semester) {
+    Course tmp;
+    cout << "Add courses to semester" << endl;
+    cout << "Course ID: ";
+    cin >> tmp.courseID;
+    cout << "Course Name: ";
+    cin.ignore(1000, '\n');
+    getline(cin, tmp.courseName);
+    cout << "Teacher Name: ";
+    getline(cin, tmp.teacherName);
+    cout << "Number of credits: ";
+    cin >> tmp.credits;
+    cout << "Number of students: ";
+    cin >> tmp.maxStudent;
+    cin.ignore(1000, '\n');
+
+    bool inputGood = false;
+    while (!inputGood) {
+        cout << "Day 1 (1. MON 2.TUE 3.WED 4.THU 5.FRI 6.SAT 7.SUN): ";
+        string dayChoice;
+        getline(cin, dayChoice);
+        if (dayChoice.size() >= 2) {
+            cout << "Invalid input, input again" << endl;
+        } else {
+            switch(dayChoice[0]) {
+                case '1':
+                    tmp.day1 = "MON";
+                    inputGood = true;
+                    break;
+                case '2':
+                    tmp.day1 = "TUE";
+                    inputGood = true;
+                    break;
+                case '3':
+                    tmp.day1 = "WED";
+                    inputGood = true;
+                    break;
+                case '4':
+                    tmp.day1 = "THU";
+                    inputGood = true;
+                    break;
+                case '5':
+                    tmp.day1 = "FRI";
+                    inputGood = true;
+                    break;
+                case '6':
+                    tmp.day1 = "SAT";
+                    inputGood = true;
+                    break;
+                case '7':
+                    tmp.day1 = "SUN";
+                    inputGood = true;
+                    break;
+                default:
+                    cout << "Invalid input, input again" << endl;
+                    break;
+            }
+        }
+    }
+    
+    inputGood = false;
+    while (!inputGood) {
+        cout << "Session I 1. S1(7:30) 2. S2(9:30) 3. S3(13:30) 4. S4(15:30): ";
+        string dayChoice;
+        getline(cin,dayChoice);
+        if (dayChoice.size() >= 2) {
+            cout << "Invalid input, input again" << endl;
+        } else {
+            switch(dayChoice[0]) {
+                case '1':
+                    tmp.session1 = "7:30";
+                    inputGood = true;
+                    break;
+                case '2':
+                    tmp.session1 = "9:30";
+                    inputGood = true;
+                    break;
+                case '3':
+                    tmp.session1 = "13:30";
+                    inputGood = true;
+                    break;
+                case '4':
+                    tmp.session1 = "15:30";
+                    inputGood = true;
+                    break;
+                default:
+                    cout << "Invalid input, input again" << endl;
+                    break;
+            }
+        }
+    }
+
+    inputGood = false;
+    while (!inputGood) {
+        cout << "Day 2 (1. MON 2.TUE 3.WED 4.THU 5.FRI 6.SAT 7.SUN): ";
+        string dayChoice;
+        getline(cin, dayChoice);
+        if (dayChoice.size() >= 2) {
+            cout << "Invalid input, input again" << endl;
+        } else {
+            switch(dayChoice[0]) {
+                case '1':
+                    tmp.day2 = "MON";
+                    inputGood = true;
+                    break;
+                case '2':
+                    tmp.day2 = "TUE";
+                    inputGood = true;
+                    break;
+                case '3':
+                    tmp.day2 = "WED";
+                    inputGood = true;
+                    break;
+                case '4':
+                    tmp.day2 = "THU";
+                    inputGood = true;
+                    break;
+                case '5':
+                    tmp.day2 = "FRI";
+                    inputGood = true;
+                    break;
+                case '6':
+                    tmp.day2 = "SAT";
+                    inputGood = true;
+                    break;
+                case '7':
+                    tmp.day2 = "SUN";
+                    inputGood = true;
+                    break;
+                default:
+                    cout << "Invalid input, input again" << endl;
+                    break;
+            }
+        }
+    }
+    
+    inputGood = false;
+    while (!inputGood) {
+        cout << "Session II 1. S1(7:30) 2. S2(9:30) 3. S3(13:30) 4. S4(15:30): ";
+        string dayChoice;
+        getline(cin, dayChoice);
+        if (dayChoice.size() >= 2) {
+            cout << "Invalid input, input again" << endl;
+        } else {
+            switch(dayChoice[0]) {
+                case '1':
+                    tmp.session2 = "7:30";
+                    inputGood = true;
+                    break;
+                case '2':
+                    tmp.session2 = "9:30";
+                    inputGood = true;
+                    break;
+                case '3':
+                    tmp.session2 = "13:30";
+                    inputGood = true;
+                    break;
+                case '4':
+                    tmp.session2 = "15:30";
+                    inputGood = true;
+                    break;
+                default:
+                    cout << "Invalid input, input again" << endl;
+                    break;
+            }
+        }
+    }
+    tmp.schoolyearBegin = schoolyear.begin;
+    tmp.semester = semester;
+    string fileName;
+    fileName = "courselist/" + to_string(schoolyear.begin) + to_string(schoolyear.end) + "_" + to_string(semester) + ".dat";
+    ofstream outFile(fileName, ios::binary | ios::app);
+    outFile.write(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+    outFile.close();
 }
 
 void createSemester() {
@@ -381,26 +567,38 @@ void createSemester() {
             if (semChoice[0] == '1') {
                 if (theChosen->data.sems[0] == true) {
                     cout << "It is already created" << endl;
+                    cout << "What semester do you want to create 1, 2 or 3: ";
+                    cin >> semChoice;
                 }
                 else {
                     checkEmptySem = true;
                     theChosen->data.sems[0] = true;
+                    addCourseRegistrationSession(theChosen->data, 1);
+                    addCourse(theChosen->data, 1);
                 }
             } else if (semChoice[0] == '2') {                
                 if (theChosen->data.sems[1] == true) {
                     cout << "It is already created" << endl;
+                    cout << "What semester do you want to create 1, 2 or 3: ";
+                    cin >> semChoice;
                 }
                 else {
                     checkEmptySem = true;
                     theChosen->data.sems[1] = true;
+                    addCourseRegistrationSession(theChosen->data, 2);
+                    addCourse(theChosen->data, 2);
                 }
             } else {
                 if (theChosen->data.sems[2] == true) {
                     cout << "It is already created" << endl;
+                    cout << "What semester do you want to create 1, 2 or 3: ";
+                    cin >> semChoice;
                 }
                 else {
                     checkEmptySem = true;
                     theChosen->data.sems[2] = true;
+                    addCourseRegistrationSession(theChosen->data, 3);
+                    addCourse(theChosen->data, 3);
                 }
             }
         }
@@ -424,27 +622,72 @@ void createSemester() {
     }
 }
 
+void displayCourses() {
+    SchoolYear tmpSchoolyear;
+    Course tmpCourse;
+    ifstream inFile("schoolYear.dat", ios::binary);
+    int count = 0;
+    string fileCourseName;
+    cout << "List of courses" << endl;
+    while(!inFile.eof()) {
+        inFile.read(reinterpret_cast<char *>(&tmpSchoolyear), sizeof(tmpSchoolyear));
+        if (inFile.eof()) break;
+        cout << "School year: ";
+        cout << tmpSchoolyear.begin << " " << tmpSchoolyear.end << endl;
+        for (int i = 1; i <= 3; i++) {
+            fileCourseName = "courselist/" + to_string(tmpSchoolyear.begin) + to_string(tmpSchoolyear.end) + "_" + to_string(i) + ".dat";
+            ifstream inCourseFile(fileCourseName, ios::binary);
+            cout << "\t";
+            cout << "Semester " << i << endl;
+            if (inCourseFile.fail()) {
+                if (tmpSchoolyear.sems[i - 1] == true)
+                    cout << "\t\tNo courses added" << endl;
+                else
+                    cout << "\t\tThis semester is not added" << endl;
+            } else {
+                while (!inCourseFile.eof()) {
+                    inCourseFile.read(reinterpret_cast<char *>(&tmpCourse), sizeof(tmpCourse));
+                    if (inCourseFile.eof()) break;
+                    cout << "\t\t";
+                    cout << tmpCourse.courseID << " ";
+                    cout << tmpCourse.courseName << " ";
+                    cout << tmpCourse.teacherName << " ";
+                    cout << tmpCourse.maxStudent << " ";
+                    cout << tmpCourse.credits << " ";
+                    cout << tmpCourse.day1 << " ";
+                    cout << tmpCourse.session1 << " ";
+                    cout << tmpCourse.day2 << " ";
+                    cout << tmpCourse.session2 << endl;
+                }
+            }
+            inCourseFile.close();
+        }
+        count++;   
+    }
+    if (count == 0)
+        cout << "No school years created!!!" << endl;
+    inFile.close();
+}
+
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
     cout << " -------------------- " << endl;
 
     string choice;
-    cout << "0. Sign out\t\t";
+    cout << "0. Sign out" << endl;
     // Add option here
-    cout << "1. Create school year\t\t";
+    cout << "1. Create school year" << endl;
     cout << "2. Create 1st-year class" << endl;
-    cout << "3. Add new 1st-year students to 1st-year class\t\t";
-    cout << "4. Display list of students\t\t";
+    cout << "3. Add new 1st-year students to 1st-year class" << endl;
+    cout << "4. Display list of students in exist classes" << endl;
     cout << "5. Create a semester" << endl;
-    cout << "6. Create a course registration session\t\t";
-    cout << "7. Add a course to the semester\t\t";
-    cout << endl;
-    
+    cout << "6. View list of courses" << endl;
+
     do {
         cout << "Your choice: ";
         cin >> choice;
-    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5' && choice[0] != '6' && choice[0] != '7') || choice.size() >= 2);
+    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5' && choice[0] != '6' && choice[0] != '7' && choice[0] != '8') || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
@@ -464,9 +707,10 @@ void staffMenu(bool &isOff) {
     } else if (choice[0] == '5') {
         createSemester();
     } else if (choice[0] == '6') {
-
+        displayCourses();
     } else if (choice[0] == '7') {
 
+    } else if (choice[0] == '8') {
     }
     staffMenu(isOff);
 }
