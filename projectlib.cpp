@@ -107,6 +107,51 @@ bool _checkCreatedClass(string className) {
     return false;
 }
 
+bool _checkCreatedCourse(string fileName, string courseID) {
+    ifstream inFile(fileName, ios::binary);
+    Course tmpCourse;
+    while (!inFile.eof()) {
+        inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+        if (courseID.compare(tmpCourse.courseID) == 0) return true;
+    }
+
+    return false;
+}
+
+bool _checkConflictedSession(string fileCourseName, string courseID, string fileStudentName) {
+    ifstream inFile(fileCourseName, ios::binary);
+    Course tmpCourse;
+    while (!inFile.eof()) {
+        inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+        if (tmpCourse.courseID == courseID) break;
+    }
+    inFile.close();
+
+    inFile.open(fileStudentName, ios::binary);
+    Course tmpEnrolledCourse;
+    while (!inFile.eof()) {
+        inFile.read(reinterpret_cast<char*>(&tmpEnrolledCourse), sizeof(tmpEnrolledCourse));
+        if (tmpCourse.day1.compare(tmpEnrolledCourse.day1) == 0 && tmpCourse.session1.compare(tmpEnrolledCourse.session1) == 0) return true;
+        if (tmpCourse.day2.compare(tmpEnrolledCourse.day2) == 0 && tmpCourse.session2.compare(tmpEnrolledCourse.session2) == 0) return true;
+    }
+
+    return false;
+}
+
+int numOfEnrolledCourses(string fileStudentName, int schoolyearBegin, string semester) {
+    ifstream inFile(fileStudentName, ios::binary);
+    Course tmpCourse;
+    int count = 0;
+    while (!inFile.eof()) {
+        inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+        if (tmpCourse.schoolyearBegin == schoolyearBegin && tmpCourse.semester == semester[0] - '0') 
+            count++;
+    }
+
+    inFile.close();
+    return count;
+}
+
 void createSchoolYear() {
     cout << " ------------------------ " << endl;
     cout << "|   CREATE SCHOOL YEAR   |" << endl;
@@ -669,6 +714,113 @@ void displayCourses() {
     inFile.close();
 }
 
+void enrollCourse(string username) {
+    string fileStudentName = "studentfile/" + username + ".dat";
+    
+    displayCourses();
+
+    int schoolyearBegin;
+    cout << "What school year are you studying? (Type begin year only) ";
+    cin >> schoolyearBegin;
+    
+    string semester;
+    do {
+        cout << "What semester are you studying? (1, 2, 3) ";
+        cin >> semester;
+    } while ((semester[0] != '1' && semester[0] != '2' && semester[0] != '3') || semester.size() >= 2);
+
+    if (numOfEnrolledCourses(fileStudentName, schoolyearBegin, semester) == 5) {
+        cout << "You have enrolled in 5 courses in this semester. You can't enroll in anymore!" << endl;
+        return;
+    }
+
+    string schoolyear = to_string(schoolyearBegin) + to_string(schoolyearBegin + 1); 
+    string fileCourseName;
+    fileCourseName = "courselist/" + schoolyear + "_" + semester + ".dat";
+
+    string courseID;
+    do {
+        cout << "What course ID do you want to enroll in? ";
+        cin >> courseID;
+        if (_checkCreatedCourse(fileCourseName, courseID)) break;
+        else cout << "This course doesn't exist!" << endl;
+    } while (true);
+
+    if (!_checkConflictedSession(fileCourseName, courseID, fileStudentName)) {
+        ifstream inFile(fileCourseName, ios::binary);
+        Course tmpCourse;
+        while (!inFile.eof()) {
+            inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+            if (courseID.compare(tmpCourse.courseID) == 0) break;
+        }
+        inFile.close();
+
+        ofstream outFile(fileStudentName, ios::binary | ios:: app);
+        outFile.write(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+        outFile.close();
+
+        cout << "Enroll in successfully!" << endl;
+    }
+    else cout << "You can't enroll in this course because of 2 sessions are conflicted." << endl;
+}
+
+void displayEnrolledCourses(string username) {
+    cout << "List of enrolled courses: " << endl;
+    string fileStudentName = "studentfile/" + username + ".dat";
+
+    ifstream inFile(fileStudentName, ios::binary);
+    Course tmpCourse;
+    while (!inFile.eof()) {
+        inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+        if (inFile.eof()) break;
+        cout << "\t";
+        cout << tmpCourse.courseID << " ";
+        cout << tmpCourse.courseName << " ";
+        cout << tmpCourse.teacherName << " ";
+        cout << tmpCourse.maxStudent << " ";
+        cout << tmpCourse.credits << " ";
+        cout << tmpCourse.day1 << " ";
+        cout << tmpCourse.session1 << " ";
+        cout << tmpCourse.day2 << " ";
+        cout << tmpCourse.session2 << endl;
+    }
+}
+
+void removeEnrolledCourse(string username) {
+    string fileStudentName = "studentfile/" + username + ".dat";
+    
+    displayEnrolledCourses(username);
+    
+    ifstream inFile(fileStudentName, ios::binary);
+    Course tmpCourse;
+    string courseID;
+    do {
+        cout << "What course ID do you want to remove? ";
+        cin >> courseID;
+        if (_checkCreatedCourse(fileStudentName, courseID)) break;
+        else cout << "You haven't enrolled in this course yet!" << endl;
+    } while (true);
+
+    string tmpFileName = "studentfile/tmpfile.dat";
+    ofstream outFile(tmpFileName, ios::binary | ios::app);
+
+    while (!inFile.eof()) {
+        inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+        if (inFile.eof()) break;
+
+        if (courseID.compare(tmpCourse.courseID) == 0) continue;
+
+        outFile.write(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+    }
+
+    int removeStudentFile = remove(fileStudentName.c_str());
+    int renameTmpFile = rename(tmpFileName.c_str(), fileStudentName.c_str());
+
+    cout << "Remove this course successfully!" << endl;
+    inFile.close();
+    outFile.close();
+}
+
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
@@ -705,36 +857,51 @@ void staffMenu(bool &isOff) {
         // Display list of student
         displayList();
     } else if (choice[0] == '5') {
+        // Create semester
         createSemester();
     } else if (choice[0] == '6') {
+        // Display courses
         displayCourses();
     } else if (choice[0] == '7') {
 
     } else if (choice[0] == '8') {
+    
     }
+
     staffMenu(isOff);
 }
 
-void studentMenu(bool &isOff) {
+void studentMenu(bool &isOff, string username) {
     cout << " -------------------- " << endl;
     cout << "|    STUDENT MENU    |" << endl;
     cout << " -------------------- " << endl;
     string choice;
-    cout << "0. Sign out\t\t";
-    cout << "1. Enroll in a course\t\t";
-    cout << "3. View the list of enrolled courses\t\t";
-    cout << "4. Remove a course from enrolled list\t\t";
+    cout << "0. Sign out" << endl;
+    cout << "1. Enroll in a course" << endl;
+    cout << "2. View the list of enrolled courses" << endl;
+    cout << "3. Remove a course from enrolled list" << endl;
     // Add option here
     cout << endl;
     do {
         cout << "Your choice: ";
         cin >> choice;
-    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4') || choice.size() >= 2);
+    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3') || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
         return;
-    } 
+    } else if (choice[0] == '1') {
+        // Enroll in a course
+        enrollCourse(username);
+    } else if (choice[0] == '2') {
+        // View the list of enrolled courses
+        displayEnrolledCourses(username);
+    } else if (choice[0] == '3') {
+        // Remove a course from enrolled list
+        removeEnrolledCourse(username);
+    }
+
+    studentMenu(isOff, username);
 }
 
 void _login(bool &isOff) {
@@ -755,7 +922,7 @@ void _login(bool &isOff) {
     }
     else if (loginResult == 1) {
         cout << "Login successfully" << endl;
-        studentMenu(isOff);
+        studentMenu(isOff, username);
     }
     else if (loginResult == -1) {
         cout << "Incorrect password" << endl;
@@ -812,6 +979,12 @@ void _signUp() {
             ofstream outFile("studentData.dat", ios::app);
             outFile.write(reinterpret_cast<char *>(&student), sizeof(student));
             outFile.close();
+
+            // Create personal student file:
+            string fileName = "studentfile/" + username + ".dat";
+            outFile.open(fileName, ios::binary | ios::app);
+            outFile.close();
+
         }
         cout << "Sign up successfully" << endl;
     }

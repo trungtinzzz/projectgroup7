@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdio.h>
 #include <string>
 #include <fstream>
 #include <vector>
@@ -67,10 +68,10 @@ struct StudentLinkedList {
 void createSchoolYear();
 void createClass();
 void addStudent();
+void enrollCourse(string username);
+void displayEnrolledCourses(string username);
+void removeEnrolledCourse(string username);
 
 void startMenu(bool &isOff);
-
-void DeallocateSchoolYear(SchoolYearLinkedList* &pHead);
-void DeallocateStudent(StudentLinkedList* &pHead);
 
 #endif
