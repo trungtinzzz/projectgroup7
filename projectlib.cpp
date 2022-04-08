@@ -15,7 +15,7 @@ bool _checkSpace(const string &cstr) {
     return true; 
 } 
 
-int _checkLogin(const string &username, const string &password) {
+int _checkLogin(const string &username, const string &password, StudentInfor &studentinfor) {
     ifstream inFile("staffData.dat", ios::binary);
     StaffInfor tmpStaff;
     StudentInfor tmpStudent;
@@ -38,6 +38,9 @@ int _checkLogin(const string &username, const string &password) {
         inFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
         if (username.compare(tmpStudent.username) == 0) {
             if (password.compare(tmpStudent.password) == 0) {
+                studentinfor.username = tmpStudent.username;
+                studentinfor.password = tmpStudent.password;
+                studentinfor.fullName = tmpStudent.fullName;
                 inFile.close();
                 return 1;
             }
@@ -131,6 +134,7 @@ bool _checkConflictedSession(string fileCourseName, string courseID, string file
     Course tmpEnrolledCourse;
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmpEnrolledCourse), sizeof(tmpEnrolledCourse));
+        if (tmpCourse.courseID.compare(tmpEnrolledCourse.courseID) == 0) return true;
         if (tmpCourse.day1.compare(tmpEnrolledCourse.day1) == 0 && tmpCourse.session1.compare(tmpEnrolledCourse.session1) == 0) return true;
         if (tmpCourse.day2.compare(tmpEnrolledCourse.day2) == 0 && tmpCourse.session2.compare(tmpEnrolledCourse.session2) == 0) return true;
     }
@@ -714,8 +718,69 @@ void displayCourses() {
     inFile.close();
 }
 
-void enrollCourse(string username) {
-    string fileStudentName = "studentfile/" + username + ".dat";
+void _listTheCourse() {
+    SchoolYear tmpSchoolyear;
+    Course tmpCourse;
+    ifstream inFile("schoolYear.dat", ios::binary);
+    string fileCourseName;
+    cout << "List of courses" << endl;
+    if (inFile.fail())
+        cout << "There are no courses created" << endl;
+    else { 
+        while(!inFile.eof()) {
+            inFile.read(reinterpret_cast<char *>(&tmpSchoolyear), sizeof(tmpSchoolyear));
+            if (inFile.eof()) break;
+            cout << "School year: ";
+            cout << tmpSchoolyear.begin << " " << tmpSchoolyear.end << endl;
+            for (int i = 1; i <= 3; i++) {
+                fileCourseName = "courselist/" + to_string(tmpSchoolyear.begin) + to_string(tmpSchoolyear.end) + "_" + to_string(i) + ".dat";
+                ifstream inCourseFile(fileCourseName, ios::binary);
+                if (!inCourseFile.fail()) {
+                    while (!inCourseFile.eof()) {
+                        inCourseFile.read(reinterpret_cast<char *>(&tmpCourse), sizeof(tmpCourse));
+                        if (inCourseFile.eof()) break;
+                        cout << "\t\t";
+                        cout << tmpCourse.courseID << " ";
+                        cout << tmpCourse.courseName << " ";
+                        cout << tmpCourse.teacherName << " ";
+                        cout << tmpCourse.maxStudent << " ";
+                        cout << tmpCourse.credits << " ";
+                        cout << tmpCourse.day1 << " ";
+                        cout << tmpCourse.session1 << " ";
+                        cout << tmpCourse.day2 << " ";
+                        cout << tmpCourse.session2 << endl;
+                    }
+                }
+                inCourseFile.close();
+            }
+        }
+    }
+    inFile.close();
+}
+
+void displayStudentOfCourse() {
+    _listTheCourse();
+    cout << "Enter course ID: ";
+    string courseID;
+    cin.ignore();
+    getline(cin, courseID);
+    string fileName = "attendedCourse/" + courseID + ".dat"; 
+    ifstream inFile(fileName, ios::binary);
+    if (inFile.fail()) {
+        cout << "No students enroll this course" << endl;
+    } else {
+        string studentName;
+        while (!inFile.eof()) {
+            inFile.read(reinterpret_cast<char *>(&studentName), sizeof(studentName));
+            if (inFile.eof()) break;
+            cout << studentName << endl;
+        }
+    }
+    inFile.close();
+}
+
+void enrollCourse(StudentInfor studentinfor) {
+    string fileStudentName = "studentfile/" + studentinfor.username + ".dat";
     
     displayCourses();
 
@@ -757,6 +822,12 @@ void enrollCourse(string username) {
 
         ofstream outFile(fileStudentName, ios::binary | ios:: app);
         outFile.write(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+        outFile.close();
+
+        string attendedCourse;
+        attendedCourse = "attendedCourse/" + tmpCourse.courseID + ".dat";
+        outFile.open(attendedCourse, ios::binary | ios::app);
+        outFile.write(reinterpret_cast<char *>(&studentinfor.fullName), sizeof(studentinfor.fullName));
         outFile.close();
 
         cout << "Enroll in successfully!" << endl;
@@ -835,11 +906,15 @@ void staffMenu(bool &isOff) {
     cout << "4. Display list of students in exist classes" << endl;
     cout << "5. Create a semester" << endl;
     cout << "6. View list of courses" << endl;
+    cout << "7" << endl;
+    cout << "8" << endl;
+    cout << "9. View list of student in a course" << endl;
 
     do {
         cout << "Your choice: ";
         cin >> choice;
-    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5' && choice[0] != '6' && choice[0] != '7' && choice[0] != '8') || choice.size() >= 2);
+    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5' 
+    && choice[0] != '6' && choice[0] != '7' && choice[0] != '8' && choice[0] != '9') || choice.size() >= 2);
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
@@ -866,12 +941,14 @@ void staffMenu(bool &isOff) {
 
     } else if (choice[0] == '8') {
     
+    } else if (choice[0] == '9') {
+        displayStudentOfCourse();
     }
 
     staffMenu(isOff);
 }
 
-void studentMenu(bool &isOff, string username) {
+void studentMenu(bool &isOff, StudentInfor studentinfor) {
     cout << " -------------------- " << endl;
     cout << "|    STUDENT MENU    |" << endl;
     cout << " -------------------- " << endl;
@@ -881,7 +958,6 @@ void studentMenu(bool &isOff, string username) {
     cout << "2. View the list of enrolled courses" << endl;
     cout << "3. Remove a course from enrolled list" << endl;
     // Add option here
-    cout << endl;
     do {
         cout << "Your choice: ";
         cin >> choice;
@@ -892,19 +968,20 @@ void studentMenu(bool &isOff, string username) {
         return;
     } else if (choice[0] == '1') {
         // Enroll in a course
-        enrollCourse(username);
+        enrollCourse(studentinfor);
     } else if (choice[0] == '2') {
         // View the list of enrolled courses
-        displayEnrolledCourses(username);
+        displayEnrolledCourses(studentinfor.username);
     } else if (choice[0] == '3') {
         // Remove a course from enrolled list
-        removeEnrolledCourse(username);
+        removeEnrolledCourse(studentinfor.username);
     }
 
-    studentMenu(isOff, username);
+    studentMenu(isOff, studentinfor);
 }
 
 void _login(bool &isOff) {
+    StudentInfor studentinfor;
     string username, password;
     int loginResult;
     
@@ -915,14 +992,14 @@ void _login(bool &isOff) {
     cout << "Password: ";
     getline(cin, password);
 
-    loginResult = _checkLogin(username, password);
+    loginResult = _checkLogin(username, password, studentinfor);
     if (loginResult == 0) {
         cout << "Login successfully" << endl;
         staffMenu(isOff);
     }
     else if (loginResult == 1) {
         cout << "Login successfully" << endl;
-        studentMenu(isOff, username);
+        studentMenu(isOff, studentinfor);
     }
     else if (loginResult == -1) {
         cout << "Incorrect password" << endl;
