@@ -768,7 +768,7 @@ void displayStudentOfCourse() {
     ifstream inFile(fileName, ios::binary);
     if (inFile.fail()) {
         cout << "No students enroll this course" << endl;
-    } else {
+    } else { 
         string studentName;
         while (!inFile.eof()) {
             inFile.read(reinterpret_cast<char *>(&studentName), sizeof(studentName));
