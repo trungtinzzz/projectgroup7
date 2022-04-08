@@ -779,6 +779,7 @@ void displayStudentOfCourse() {
     inFile.close();
 }
 
+
 void enrollCourse(StudentInfor studentinfor) {
     string fileStudentName = "studentfile/" + studentinfor.username + ".dat";
     
