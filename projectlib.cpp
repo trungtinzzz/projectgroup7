@@ -758,26 +758,6 @@ void _listTheCourse() {
     inFile.close();
 }
 
-void displayStudentOfCourse() {
-    _listTheCourse();
-    cout << "Enter course ID: ";
-    string courseID;
-    cin.ignore();
-    getline(cin, courseID);
-    string fileName = "attendedCourse/" + courseID + ".dat"; 
-    ifstream inFile(fileName, ios::binary);
-    if (inFile.fail()) {
-        cout << "No students enroll this course" << endl;
-    } else {
-        string studentName;
-        while (!inFile.eof()) {
-            inFile.read(reinterpret_cast<char *>(&studentName), sizeof(studentName));
-            if (inFile.eof()) break;
-            cout << studentName << endl;
-        }
-    }
-    inFile.close();
-}
 
 void enrollCourse(StudentInfor studentinfor) {
     string fileStudentName = "studentfile/" + studentinfor.username + ".dat";
