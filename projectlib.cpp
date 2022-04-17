@@ -1095,6 +1095,22 @@ void displayScoreboardOfClass() {
         return;
     }
 
+    Student student;
+    while (!inClassFile.eof()) {
+        inClassFile.read(reinterpret_cast<char*>(&student), sizeof(student));
+        if (inClassFile.eof()) break;
+
+        string studentID = student.StudentID;
+        
+        ifstream inStudentFile("studentData.dat", ios::binary);
+        while (!inStudentFile.eof()) {
+            
+        }
+        inStudentFile.close();
+    }
+    inClassFile.close();
+}
+
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
