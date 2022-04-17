@@ -938,7 +938,7 @@ void exportToCsv() {
         inYearFile.read(reinterpret_cast<char *>(&tmpSchoolyear), sizeof(tmpSchoolyear));
         if (inYearFile.eof()) break;
     
-        for (int i = 1; i < 3; i++) {
+        for (int i = 1; i <= 3; i++) {
             fileCourseName = "courselist/" + to_string(tmpSchoolyear.begin) + to_string(tmpSchoolyear.end) + "_" + to_string(i) + ".dat";
             ifstream inCourseFile(fileCourseName, ios::binary);
             if (!inCourseFile.fail()) {
@@ -968,6 +968,7 @@ void exportToCsv() {
             inCourseFile.close();
         }
     }
+    inYearFile.close();
 
     cout << "Export to file CSV successfully!" << endl;
 }
