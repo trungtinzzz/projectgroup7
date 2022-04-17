@@ -1005,7 +1005,24 @@ void importScoreboard() { // consists of update the result of the students
         file.close();
         return;
     }
-}
+
+    int semester = _findSemesterOfCourse(courseID);
+
+    string fileAttendedCourse = "attendedCourse/" + courseID + "_scoreboard.dat";
+    ofstream outFile(fileAttendedCourse, ios::binary | ios::app);
+
+
+    for(int i = 0; i < n; i++) {
+        Scoreboard tmp;
+        tmp.courseID = courseID;
+        tmp.No = data[i][0];
+        tmp.StudentID = data[i][1];
+        tmp.FullName = data[i][2];
+        tmp.TotalMark = atof(data[i][3].c_str());
+        tmp.FinalMark = atof(data[i][4].c_str());
+        tmp.MidtermMark = atof(data[i][5].c_str());
+        tmp.OtherMark = atof(data[i][6].c_str());
+
 
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
