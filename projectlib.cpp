@@ -1104,7 +1104,16 @@ void displayScoreboardOfClass() {
         
         ifstream inStudentFile("studentData.dat", ios::binary);
         while (!inStudentFile.eof()) {
-            
+            StudentInfor studentinfor;
+            inStudentFile.read(reinterpret_cast<char*>(&studentinfor), sizeof(studentinfor));
+            if (inStudentFile.eof()) break;
+
+            // cout << studentID << " " << studentinfor.studentID << endl;
+            if (studentID.compare(studentinfor.studentID) == 0) {
+                cout << studentinfor.studentID << " " << studentinfor.fullName << " ";
+                for(int i = 1; i <= studentinfor.numOfCourse; i++) 
+                    cout << studentinfor.score[i].courseID << ":" << studentinfor.score[i].FinalMark << " ";
+            }
         }
         inStudentFile.close();
     }
