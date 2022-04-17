@@ -1053,6 +1053,8 @@ void importScoreboard() { // consists of update the result of the students
         int renameTmpFile = rename(tmpFileName.c_str(), fileStudentDataName.c_str());
     }
 
+    cout << "Import the scoreboard successfully!" << endl;
+
     outFile.close();
 }
 
