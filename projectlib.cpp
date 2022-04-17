@@ -1056,6 +1056,7 @@ void importScoreboard() { // consists of update the result of the students
     cout << "Import the scoreboard successfully!" << endl;
 
     outFile.close();
+
 }
 
 void displayScoreboardOfCourse() {
@@ -1113,6 +1114,13 @@ void displayScoreboardOfClass() {
                 cout << studentinfor.studentID << " " << studentinfor.fullName << " ";
                 for(int i = 1; i <= studentinfor.numOfCourse; i++) 
                     cout << studentinfor.score[i].courseID << ":" << studentinfor.score[i].FinalMark << " ";
+                    
+                for(int i = 1; i <= 3; i++)
+                    cout << "Semester" << i << ":" << studentinfor.semesterGPA[i] << " ";
+                
+                cout << "OverallGPA:" << studentinfor.overallGPA << endl;
+                
+                break;
             }
         }
         inStudentFile.close();
