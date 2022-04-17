@@ -1023,6 +1023,39 @@ void importScoreboard() { // consists of update the result of the students
         tmp.MidtermMark = atof(data[i][5].c_str());
         tmp.OtherMark = atof(data[i][6].c_str());
 
+        outFile.write(reinterpret_cast<char*>(&tmp), sizeof(tmp));
+
+        // Update result of this student:
+        string fileStudentDataName = "studentData.dat";
+        string tmpFileName = "tmpfile.dat";
+        ofstream outTmpFile(tmpFileName, ios::binary | ios::app);
+        ifstream inStudentFile(fileStudentDataName, ios::binary);
+
+        while (!inStudentFile.eof()) {
+            StudentInfor studentinfor;
+            inStudentFile.read(reinterpret_cast<char*>(&studentinfor), sizeof(studentinfor));
+            if (inStudentFile.eof()) break;
+
+            if (tmp.StudentID.compare(studentinfor.studentID) == 0) {
+                studentinfor.numOfCourse++;
+                studentinfor.semesterGPA[semester] = ((studentinfor.semesterGPA[semester] * (studentinfor.numOfCourse - 1)) + tmp.TotalMark) / studentinfor.numOfCourse;
+                studentinfor.overallGPA = (studentinfor.semesterGPA[1] + studentinfor.semesterGPA[2] + studentinfor.semesterGPA[3]) / 3;
+                studentinfor.score[studentinfor.numOfCourse] = tmp;
+            }
+            
+            outTmpFile.write(reinterpret_cast<char*>(&studentinfor), sizeof(studentinfor));
+        }
+
+        inStudentFile.close();
+        outTmpFile.close();
+
+        int removeStudentFile = remove(fileStudentDataName.c_str());
+        int renameTmpFile = rename(tmpFileName.c_str(), fileStudentDataName.c_str());
+    }
+
+    outFile.close();
+}
+
 
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
