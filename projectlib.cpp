@@ -927,7 +927,50 @@ void removeEnrolledCourse(string username) {
     outFile.close();
 }
 
+void exportToCsv() {
+    ifstream inYearFile("schoolYear.dat", ios::binary);
+    SchoolYear tmpSchoolyear;
+    string fileCourseName;
+    string attendedCourse;
+    Course tmpCourse;
+    StudentInfor studentinfor;
+    while(!inYearFile.eof()) {
+        inYearFile.read(reinterpret_cast<char *>(&tmpSchoolyear), sizeof(tmpSchoolyear));
+        if (inYearFile.eof()) break;
+    
+        for (int i = 1; i < 3; i++) {
+            fileCourseName = "courselist/" + to_string(tmpSchoolyear.begin) + to_string(tmpSchoolyear.end) + "_" + to_string(i) + ".dat";
+            ifstream inCourseFile(fileCourseName, ios::binary);
+            if (!inCourseFile.fail()) {
+                while (!inCourseFile.eof()) {
+                    inCourseFile.read(reinterpret_cast<char *>(&tmpCourse), sizeof(tmpCourse));
+                    if (inCourseFile.eof()) break;
 
+                    attendedCourse = "attendedCourse/" + tmpCourse.courseID + ".dat";
+                    ifstream inAttendedCourseFile(attendedCourse, ios::binary);
+                    if (inAttendedCourseFile.fail()) continue;
+
+                    string courseName = tmpCourse.courseID + ".csv";
+                    ofstream outFile(courseName, ios::out | ios::app);
+
+                    while (!inAttendedCourseFile.eof()) {
+                        inAttendedCourseFile.read(reinterpret_cast<char *>(&studentinfor), sizeof(studentinfor));
+                        if (inAttendedCourseFile.eof()) break;
+
+                        outFile << studentinfor.fullName << "\n";
+                        cout << studentinfor.fullName << endl;
+                    }
+
+                    inAttendedCourseFile.close();
+                    outFile.close();
+                }
+            }
+            inCourseFile.close();
+        }
+    }
+
+    cout << "Export to file CSV successfully!" << endl;
+}
 
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
