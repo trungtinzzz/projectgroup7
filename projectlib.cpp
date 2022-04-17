@@ -1072,7 +1072,7 @@ void displayScoreboardOfCourse() {
         Scoreboard score;
         while (!inFile.eof()) {
             inFile.read(reinterpret_cast<char *>(&score), sizeof(score));
-            if (!inFile.eof()) break;
+            if (inFile.eof()) break;
             cout << score.No << " " << score.StudentID << " " << score.FullName << " " 
                  << score.TotalMark << " " << score.FinalMark << " "
                  << score.MidtermMark << " " << score.OtherMark << endl;
