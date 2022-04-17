@@ -1078,7 +1078,7 @@ void displayScoreboardOfCourse() {
                  << score.MidtermMark << " " << score.OtherMark << endl;
         }
     }
-    inFile.close()
+    inFile.close();
 }
 
 
