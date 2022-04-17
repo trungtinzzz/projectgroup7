@@ -142,6 +142,39 @@ bool _checkConflictedSession(string fileCourseName, string courseID, string file
     return false;
 }
 
+int _findSemesterOfCourse(string courseID) {
+    SchoolYear tmpSchoolyear;
+    Course tmpCourse;
+    ifstream inFile("schoolYear.dat", ios::binary);
+    string fileCourseName;
+    if (inFile.fail())
+        return 0;
+    else { 
+        while(!inFile.eof()) {
+            inFile.read(reinterpret_cast<char *>(&tmpSchoolyear), sizeof(tmpSchoolyear));
+            if (inFile.eof()) break;
+
+            for (int i = 1; i <= 3; i++) {
+                fileCourseName = "courselist/" + to_string(tmpSchoolyear.begin) + to_string(tmpSchoolyear.end) + "_" + to_string(i) + ".dat";
+                ifstream inCourseFile(fileCourseName, ios::binary);
+                if (!inCourseFile.fail()) {
+                    while (!inCourseFile.eof()) {
+                        inCourseFile.read(reinterpret_cast<char *>(&tmpCourse), sizeof(tmpCourse));
+                        if (inCourseFile.eof()) break;
+                        
+                        if (courseID.compare(tmpCourse.courseID) == 0) {
+                            inCourseFile.close();
+                            return i;
+                        }
+                    }
+                }
+                inCourseFile.close();
+            }
+        }
+    }
+    inFile.close();
+}
+
 int numOfEnrolledCourses(string fileStudentName, int schoolyearBegin, string semester) {
     ifstream inFile(fileStudentName, ios::binary);
     Course tmpCourse;
@@ -217,6 +250,7 @@ void addStudent() {
     
     string fileName = "studentlist/" + className + ".dat";
     ofstream outFile(fileName, ios::app | ios::binary);
+
     string csvFileName;
     cout << "Enter the file name: ";
     cin >> csvFileName;
@@ -273,24 +307,25 @@ void displayList() {
     int studentCount;
     while(!inFile.eof()) {
         inFile.read(reinterpret_cast<char *>(&classFileName), sizeof(classFileName));
-        if (inFile.eof()) {
-            break;
-        } 
+        if (inFile.eof()) break;
+        
         cout << "Class " << classFileName << ":" << endl;
         studentFileName = "studentlist/" + classFileName + ".dat";
         studentFile.open(studentFileName, ios::binary);
         studentCount = 0;
-        while(!studentFile.eof()) {
-            studentFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
-            if (studentFile.eof()) {
-                studentFile.close();
-                break;
-            } 
-            cout << "\t" << tmpStudent.No << " " << tmpStudent.StudentID << " ";
-            cout << tmpStudent.FName << " " << tmpStudent.LName << " ";
-            cout << tmpStudent.Gender << " " << tmpStudent.DoB << " " << tmpStudent.SocialID << " ";
-            cout << endl;
-            studentCount++;
+        if (!studentFile.fail()) {
+            while(!studentFile.eof()) {
+                studentFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
+                if (studentFile.eof()) {
+                    studentFile.close();
+                    break;
+                } 
+                cout << "\t" << tmpStudent.No << " " << tmpStudent.StudentID << " ";
+                cout << tmpStudent.FName << " " << tmpStudent.LName << " ";
+                cout << tmpStudent.Gender << " " << tmpStudent.DoB << " " << tmpStudent.SocialID << " ";
+                cout << endl;
+                studentCount++;
+            }
         }
         if (studentCount == 0)
             cout << "\tNo students" << endl;
@@ -769,11 +804,11 @@ void displayStudentOfCourse() {
     if (inFile.fail()) {
         cout << "No students enroll this course" << endl;
     } else {
-        string studentName;
+        StudentInfor studentinfor;
         while (!inFile.eof()) {
-            inFile.read(reinterpret_cast<char *>(&studentName), sizeof(studentName));
+            inFile.read(reinterpret_cast<char *>(&studentinfor), sizeof(studentinfor));
             if (inFile.eof()) break;
-            cout << studentName << endl;
+            cout << studentinfor.fullName << endl;
         }
     }
     inFile.close();
@@ -827,7 +862,7 @@ void enrollCourse(StudentInfor studentinfor) {
         string attendedCourse;
         attendedCourse = "attendedCourse/" + tmpCourse.courseID + ".dat";
         outFile.open(attendedCourse, ios::binary | ios::app);
-        outFile.write(reinterpret_cast<char *>(&studentinfor.fullName), sizeof(studentinfor.fullName));
+        outFile.write(reinterpret_cast<char *>(&studentinfor), sizeof(studentinfor));
         outFile.close();
 
         cout << "Enroll in successfully!" << endl;
@@ -892,6 +927,8 @@ void removeEnrolledCourse(string username) {
     outFile.close();
 }
 
+
+
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
@@ -909,40 +946,53 @@ void staffMenu(bool &isOff) {
     cout << "7" << endl;
     cout << "8" << endl;
     cout << "9. View list of student in a course" << endl;
-
+    cout << "10. Export a list of students in a course to a CSV file" << endl;
+    cout << "11. Import a scoreboard of a course" << endl; 
+    cout << "12. View the scoreboard of a course" << endl;
+    cout << "13. View the scoreboard of a class" << endl;
+    
     do {
         cout << "Your choice: ";
         cin >> choice;
     } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5' 
-    && choice[0] != '6' && choice[0] != '7' && choice[0] != '8' && choice[0] != '9') || choice.size() >= 2);
+                && choice != "6" && choice != "7" && choice != "8" && choice != "9" && choice == "10" && choice == "11" 
+                && choice == "12" && choice == "13"));
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
         return;
-    } else if (choice[0] == '1') {
+    } else if (choice == "1") {
         // Create school year
         createSchoolYear();
-    } else if (choice[0] == '2') {
+    } else if (choice == "2") {
         // Create 1st-year classes
         createClass();
-    } else if (choice[0] == '3') {
+    } else if (choice == "3") {
         // Add new 1st-year student to 1st-year classes
         addStudent();
-    } else if (choice[0] == '4') {
+    } else if (choice == "4") {
         // Display list of student
         displayList();
-    } else if (choice[0] == '5') {
+    } else if (choice == "5") {
         // Create semester
         createSemester();
-    } else if (choice[0] == '6') {
+    } else if (choice == "6") {
         // Display courses
         displayCourses();
-    } else if (choice[0] == '7') {
+    } else if (choice == "7") {
 
-    } else if (choice[0] == '8') {
+    } else if (choice == "8") {
     
-    } else if (choice[0] == '9') {
+    } else if (choice == "9") {
         displayStudentOfCourse();
+    } else if (choice == "10") {
+        exportToCsv();
+    } else if (choice == "11") {
+        importScoreboard();
+    } else if (choice == "12") {
+        displayScoreboardOfCourse();
+    } else if (choice == "13") {
+        displayScoreboardOfClass();
     }
 
     staffMenu(isOff);
@@ -1053,6 +1103,13 @@ void _signUp() {
             student.username = username;
             student.password = password;
             student.fullName = fullname;
+            cout << "Your StudentID: ";
+            getline(cin, student.studentID);
+            student.numOfCourse = 0;
+            for(int i = 1; i <= 3; i++)
+                student.semesterGPA[i] = 0;
+            student.overallGPA = 0;
+
             ofstream outFile("studentData.dat", ios::app);
             outFile.write(reinterpret_cast<char *>(&student), sizeof(student));
             outFile.close();

@@ -10,10 +10,21 @@
 #include <sstream>
 #include <iomanip>
 using namespace std;
+
+struct Scoreboard {
+    string courseID;
+    string No, StudentID, FullName;
+    double TotalMark, FinalMark, MidtermMark, OtherMark;
+};
+
 struct StudentInfor {
     string username;
     string password;
     string fullName;
+    string studentID;
+    int numOfCourse;
+    Scoreboard score[100];
+    double semesterGPA[4], overallGPA;
 };
 
 struct StaffInfor {
