@@ -1081,6 +1081,19 @@ void displayScoreboardOfCourse() {
     inFile.close();
 }
 
+void displayScoreboardOfClass() {
+    string className;
+    cout << "What class of the scoreboard do you want to view? ";
+    cin >> className;
+
+    string fileClassName = "studentlist/" + className + ".dat";
+    ifstream inClassFile(fileClassName, ios::binary);
+
+    if (inClassFile.fail()) {
+        cout << "No data!" << endl;
+        inClassFile.close();
+        return;
+    }
 
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
