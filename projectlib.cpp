@@ -973,6 +973,40 @@ void exportToCsv() {
     cout << "Export to file CSV successfully!" << endl;
 }
 
+void importScoreboard() { // consists of update the result of the students
+    string courseID;
+    cout << "What course ID do you want to import the scoreboard? ";
+    cin >> courseID;
+
+    string csvFileName;
+    cout << "Enter the file name: ";
+    cin >> csvFileName;
+
+    string data[1000][7];
+    string line, word;
+
+    fstream file(csvFileName, ios::in);
+    int n = 0;
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            stringstream str(line);
+
+            int j = 0;
+            while (getline(str, word, ',')) {
+                data[n][j] = word;
+                j++;
+            }
+            n++;
+        }
+        file.close();
+    }
+    else {
+        cout << "Could not open the file\n";
+        file.close();
+        return;
+    }
+}
+
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
