@@ -173,6 +173,7 @@ int _findSemesterOfCourse(string courseID) {
         }
     }
     inFile.close();
+    return -1;
 }
 
 int numOfEnrolledCourses(string fileStudentName, int schoolyearBegin, string semester) {
@@ -360,6 +361,22 @@ bool _checkCourseRegistration(CourseRegistration course) {
     return true;
 }
 
+void _displayCourseRegistration(CourseRegistrationLinkedList *pHead) {
+    cout << "Course registration sessions created" << endl;
+    int count = 0;
+    CourseRegistrationLinkedList *pCur = pHead;
+    while (pCur != nullptr) {
+        cout << pCur->data.schoolyear << " " << pCur->data.schoolyear + 1 << endl;
+        cout << "\tSemester " << pCur->data.semester << endl;
+        cout << "\t\t" << pCur->data.start.year << "/" << pCur->data.start.month << "/" << pCur->data.start.date << " - ";
+        cout << pCur->data.end.year << "/" << pCur->data.end.month << "/" << pCur->data.end.date << endl;
+        count++;
+        pCur = pCur->pNext;
+    }
+    if (count == 0)
+        cout << "There are no coure registration sessions created";
+}
+
 void addCourseRegistrationSession(SchoolYear schoolyear, int semester) {
     CourseRegistration tmp;
     string tmpStartDate, tmpStartMonth, tmpStartYear, tmpEndDate, tmpEndMonth, tmpEndYear;
@@ -368,19 +385,19 @@ void addCourseRegistrationSession(SchoolYear schoolyear, int semester) {
     do {
         cout << "Start" << endl;
         cout << "Year: ";
-        cin >> tmpStartYear;
+        getline(cin, tmpStartYear);
         cout << "Month: ";
-        cin >> tmpStartMonth;
+        getline(cin, tmpStartMonth);
         cout << "Date: ";
-        cin >> tmpStartDate;
+        getline(cin, tmpStartDate);
         cout << "----------" << endl;
         cout << "End" << endl;
         cout << "Year: ";
-        cin >> tmpEndYear;
+        getline(cin, tmpEndYear);
         cout << "Month: ";
-        cin >> tmpEndMonth;
+        getline(cin, tmpEndMonth);
         cout << "Date: ";
-        cin >> tmpEndDate;
+        getline(cin, tmpEndDate);
         try {
             tmp.start.year = stoi(tmpStartYear);
             tmp.start.month = stoi(tmpStartMonth);
@@ -407,18 +424,38 @@ void addCourse(SchoolYear schoolyear, int semester) {
     Course tmp;
     cout << "Add courses to semester" << endl;
     cout << "Course ID: ";
-    cin >> tmp.courseID;
+    getline(cin, tmp.courseID);
     cout << "Course Name: ";
-    cin.ignore(1000, '\n');
     getline(cin, tmp.courseName);
     cout << "Teacher Name: ";
     getline(cin, tmp.teacherName);
-    cout << "Number of credits: ";
-    cin >> tmp.credits;
-    cout << "Number of students: ";
-    cin >> tmp.maxStudent;
-    cin.ignore(1000, '\n');
-
+    bool isCheck;
+    do {
+        isCheck = false;
+        cout << "Number of credits: ";
+        string tmpCredit;
+        getline(cin, tmpCredit);
+        try {
+            tmp.credits = stoi(tmpCredit);
+            isCheck = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isCheck);
+    
+    do {
+        isCheck = false;
+        cout << "Number of students: ";
+        string tmpStudent;
+        getline(cin, tmpStudent);
+        try {
+            tmp.maxStudent = stoi(tmpStudent);
+            isCheck = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isCheck);
+    
     bool inputGood = false;
     while (!inputGood) {
         cout << "Day 1 (1. MON 2.TUE 3.WED 4.THU 5.FRI 6.SAT 7.SUN): ";
@@ -725,24 +762,54 @@ void displayCourses() {
             cout << "Semester " << i << endl;
             if (inCourseFile.fail()) {
                 if (tmpSchoolyear.sems[i - 1] == true)
-                    cout << "\t\tNo courses added" << endl;
+                    cout << "\tNo courses added" << endl;
                 else
-                    cout << "\t\tThis semester is not added" << endl;
+                    cout << "\tThis semester is not added" << endl;
             } else {
+                int subCount = 0;
+                cout << "\t";
+                cout << setw(12) << left << "Course ID";
+                cout << " | ";
+                cout << setw(25) << left << "Course Name";
+                cout << " | ";
+                cout << setw(20) << left << "Teacher Name";
+                cout << " | ";
+                cout << setw(20) << left << "Number of students";
+                cout << " | ";
+                cout << setw(20) << left << "Number of credits";
+                cout << " | ";
+                cout << setw(5) << left << "Day 1";
+                cout << " | ";
+                cout << setw(10) << left << "Session I";
+                cout << " | ";
+                cout << setw(5) << left << "Day 2";
+                cout << " | ";
+                cout << "Session II" << endl;
                 while (!inCourseFile.eof()) {
                     inCourseFile.read(reinterpret_cast<char *>(&tmpCourse), sizeof(tmpCourse));
                     if (inCourseFile.eof()) break;
-                    cout << "\t\t";
-                    cout << tmpCourse.courseID << " ";
-                    cout << tmpCourse.courseName << " ";
-                    cout << tmpCourse.teacherName << " ";
-                    cout << tmpCourse.maxStudent << " ";
-                    cout << tmpCourse.credits << " ";
-                    cout << tmpCourse.day1 << " ";
-                    cout << tmpCourse.session1 << " ";
-                    cout << tmpCourse.day2 << " ";
+                    subCount++;
+                    cout << "\t";
+                    cout << setw(12) << left << tmpCourse.courseID;
+                    cout << " | ";
+                    cout << setw(25) << left << tmpCourse.courseName;
+                    cout << " | ";
+                    cout << setw(20) << left << tmpCourse.teacherName;
+                    cout << " | ";
+                    cout << setw(20) << left << tmpCourse.maxStudent;
+                    cout << " | ";
+                    cout << setw(20) << left << tmpCourse.credits;
+                    cout << " | ";
+                    cout << setw(5) << left << tmpCourse.day1;
+                    cout << " | ";
+                    cout << setw(10) << left << tmpCourse.session1;
+                    cout << " | ";
+                    cout << setw(5) << left << tmpCourse.day2;
+                    cout << " | ";
                     cout << tmpCourse.session2 << endl;
                 }
+                if (subCount == 0)
+                    cout << "\tNo courses added" << endl;
             }
             inCourseFile.close();
         }
@@ -753,48 +820,8 @@ void displayCourses() {
     inFile.close();
 }
 
-void _listTheCourse() {
-    SchoolYear tmpSchoolyear;
-    Course tmpCourse;
-    ifstream inFile("schoolYear.dat", ios::binary);
-    string fileCourseName;
-    cout << "List of courses" << endl;
-    if (inFile.fail())
-        cout << "There are no courses created" << endl;
-    else { 
-        while(!inFile.eof()) {
-            inFile.read(reinterpret_cast<char *>(&tmpSchoolyear), sizeof(tmpSchoolyear));
-            if (inFile.eof()) break;
-            cout << "School year: ";
-            cout << tmpSchoolyear.begin << " " << tmpSchoolyear.end << endl;
-            for (int i = 1; i <= 3; i++) {
-                fileCourseName = "courselist/" + to_string(tmpSchoolyear.begin) + to_string(tmpSchoolyear.end) + "_" + to_string(i) + ".dat";
-                ifstream inCourseFile(fileCourseName, ios::binary);
-                if (!inCourseFile.fail()) {
-                    while (!inCourseFile.eof()) {
-                        inCourseFile.read(reinterpret_cast<char *>(&tmpCourse), sizeof(tmpCourse));
-                        if (inCourseFile.eof()) break;
-                        cout << "\t\t";
-                        cout << tmpCourse.courseID << " ";
-                        cout << tmpCourse.courseName << " ";
-                        cout << tmpCourse.teacherName << " ";
-                        cout << tmpCourse.maxStudent << " ";
-                        cout << tmpCourse.credits << " ";
-                        cout << tmpCourse.day1 << " ";
-                        cout << tmpCourse.session1 << " ";
-                        cout << tmpCourse.day2 << " ";
-                        cout << tmpCourse.session2 << endl;
-                    }
-                }
-                inCourseFile.close();
-            }
-        }
-    }
-    inFile.close();
-}
-
 void displayStudentOfCourse() {
-    _listTheCourse();
+    displayCourses();
     cout << "Enter course ID: ";
     string courseID;
     cin.ignore();
@@ -1059,6 +1086,389 @@ void importScoreboard() { // consists of update the result of the students
 
 }
 
+void updateCourseInfor() {
+    string schoolYear;
+    int tmpBegin;
+    bool isGood;
+    do {
+        cout << "Enter school year (begin year only): ";
+        getline(cin, schoolYear);
+        isGood = false;
+        try {
+            tmpBegin = stoi(schoolYear);
+            isGood = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isGood);
+    
+    string semester;
+    int tmpSem;
+    do {
+        cout << "Enter semester (1, 2 or 3): ";
+        getline(cin, semester);
+        isGood = false;
+        try {
+            tmpSem = stoi(semester);
+            isGood = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isGood);
+    string fileName = "courselist/" + schoolYear + to_string(tmpBegin + 1) + "_" + semester + ".dat";
+    ifstream inFile(fileName, ios::binary);
+
+    if (inFile.fail()) {
+        cout << "No data found!!!" << endl;
+    } else {
+        displayCourses();
+        Course tmp;
+        CourseLinkedList *pHead = nullptr;
+        CourseLinkedList *pCur = nullptr;
+        while (!inFile.eof()) {
+            inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+            if (inFile.eof()) break;
+            if (pHead == nullptr) {
+                pHead = new CourseLinkedList;
+                pHead->pPrev = nullptr;
+                pHead->data = tmp;
+                pHead->pNext = nullptr;
+                pCur = pHead;
+            } else {
+                pCur->pNext = new CourseLinkedList;
+                pCur->pNext->pPrev = pCur;
+                pCur = pCur->pNext;
+                pCur->data = tmp;
+                pCur->pNext = nullptr;
+            }
+        }
+        inFile.close();
+        string courseID;
+        cout << "Enter course ID: ";
+        getline(cin, courseID);
+        pCur = pHead;
+        Course modifiedCourse;
+        while (pCur != nullptr) {
+            if ((pCur->data.courseID).compare(courseID) == 0) {
+                cout << "Course Name: ";
+                getline(cin, modifiedCourse.courseName);
+                cout << "Teacher Name: ";
+                getline(cin, modifiedCourse.teacherName);
+                bool isCheck;
+                do {
+                    isCheck = false;
+                    cout << "Number of credits: ";
+                    string tmpCredit;
+                    getline(cin, tmpCredit);
+                    try {
+                        modifiedCourse.credits = stoi(tmpCredit);
+                        isCheck = true;
+                    } catch (...) {
+                        cout << "Invalid input" << endl;
+                    }
+                } while (!isCheck);
+
+                do {
+                    isCheck = false;
+                    cout << "Number of students: ";
+                    string tmpNumOfStudent;
+                    getline(cin, tmpNumOfStudent);
+                    try {
+                        modifiedCourse.credits = stoi(tmpNumOfStudent);
+                        isCheck = true;
+                    } catch (...) {
+                        cout << "Invalid input" << endl;
+                    }
+                } while (!isCheck); 
+
+                isCheck = false;
+                while (!isCheck) {
+                    cout << "Day 1 (1. MON 2.TUE 3.WED 4.THU 5.FRI 6.SAT 7.SUN): ";
+                    string dayChoice;
+                    getline(cin, dayChoice);
+                    if (dayChoice.size() >= 2) {
+                        cout << "Invalid input, input again" << endl;
+                    } else {
+                        switch(dayChoice[0]) {
+                            case '1':
+                                modifiedCourse.day1 = "MON";
+                                isCheck = true;
+                                break;
+                            case '2':
+                                modifiedCourse.day1 = "TUE";
+                                isCheck = true;
+                                break;
+                            case '3':
+                                modifiedCourse.day1 = "WED";
+                                isCheck = true;
+                                break;
+                            case '4':
+                                modifiedCourse.day1 = "THU";
+                                isCheck = true;
+                                break;
+                            case '5':
+                                modifiedCourse.day1 = "FRI";
+                                isCheck = true;
+                                break;
+                            case '6':
+                                modifiedCourse.day1 = "SAT";
+                                isCheck = true;
+                                break;
+                            case '7':
+                                modifiedCourse.day1 = "SUN";
+                                isCheck = true;
+                                break;
+                            default:
+                                cout << "Invalid input, input again" << endl;
+                                break;
+                        }
+                    }
+                }
+                
+                isCheck = false;
+                while (!isCheck) {
+                    cout << "Session I 1. S1(7:30) 2. S2(9:30) 3. S3(13:30) 4. S4(15:30): ";
+                    string dayChoice;
+                    getline(cin,dayChoice);
+                    if (dayChoice.size() >= 2) {
+                        cout << "Invalid input, input again" << endl;
+                    } else {
+                        switch(dayChoice[0]) {
+                            case '1':
+                                modifiedCourse.session1 = "7:30";
+                                isCheck = true;
+                                break;
+                            case '2':
+                                modifiedCourse.session1 = "9:30";
+                                isCheck = true;
+                                break;
+                            case '3':
+                                modifiedCourse.session1 = "13:30";
+                                isCheck = true;
+                                break;
+                            case '4':
+                                modifiedCourse.session1 = "15:30";
+                                isCheck = true;
+                                break;
+                            default:
+                                cout << "Invalid input, input again" << endl;
+                                break;
+                        }
+                    }
+                }
+            
+                isCheck = false;
+                while (!isCheck) {
+                    cout << "Day 2 (1. MON 2.TUE 3.WED 4.THU 5.FRI 6.SAT 7.SUN): ";
+                    string dayChoice;
+                    getline(cin, dayChoice);
+                    if (dayChoice.size() >= 2) {
+                        cout << "Invalid input, input again" << endl;
+                    } else {
+                        switch(dayChoice[0]) {
+                            case '1':
+                                modifiedCourse.day2 = "MON";
+                                isCheck = true;
+                                break;
+                            case '2':
+                                modifiedCourse.day2 = "TUE";
+                                isCheck = true;
+                                break;
+                            case '3':
+                                modifiedCourse.day2 = "WED";
+                                isCheck = true;
+                                break;
+                            case '4':
+                                modifiedCourse.day2 = "THU";
+                                isCheck = true;
+                                break;
+                            case '5':
+                                modifiedCourse.day2 = "FRI";
+                                isCheck = true;
+                                break;
+                            case '6':
+                                modifiedCourse.day2 = "SAT";
+                                isCheck = true;
+                                break;
+                            case '7':
+                                modifiedCourse.day2 = "SUN";
+                                isCheck = true;
+                                break;
+                            default:
+                                cout << "Invalid input, input again" << endl;
+                                break;
+                        }
+                    }
+                }
+            
+                isCheck = false;
+                while (!isCheck) {
+                    cout << "Session II 1. S1(7:30) 2. S2(9:30) 3. S3(13:30) 4. S4(15:30): ";
+                    string dayChoice;
+                    getline(cin,dayChoice);
+                    if (dayChoice.size() >= 2) {
+                        cout << "Invalid input, input again" << endl;
+                    } else {
+                        switch(dayChoice[0]) {
+                            case '1':
+                                modifiedCourse.session2 = "7:30";
+                                isCheck = true;
+                                break;
+                            case '2':
+                                modifiedCourse.session2 = "9:30";
+                                isCheck = true;
+                                break;
+                            case '3':
+                                modifiedCourse.session2 = "13:30";
+                                isCheck = true;
+                                break;
+                            case '4':
+                                modifiedCourse.session2 = "15:30";
+                                isCheck = true;
+                                break;
+                            default:
+                                cout << "Invalid input, input again" << endl;
+                                break;
+                        }
+                    }
+                }
+                break;
+            }
+            pCur = pCur->pNext;
+        }
+
+        if (pCur == nullptr) {
+            cout << "No course found!!!" << endl; 
+        } else {
+            modifiedCourse.courseID = courseID;
+            pCur->data = modifiedCourse;
+        }
+
+        pCur = pHead;
+        ofstream outFile(fileName, ios::binary);
+        while (pCur != nullptr) {
+            outFile.write(reinterpret_cast<char *>(&pCur->data), sizeof(pCur->data));
+            pCur = pCur->pNext;
+        }
+        outFile.close();
+        
+        pCur = pHead;
+        while (pHead != nullptr) {
+            pCur = pHead;
+            pHead = pHead->pNext;
+            delete pCur;
+        }
+    }
+}
+
+void removeCourse() {
+    string schoolYear;
+    int tmpBegin;
+    bool isGood;
+    do {
+        cout << "Enter school year (begin year only): ";
+        getline(cin, schoolYear);
+        isGood = false;
+        try {
+            tmpBegin = stoi(schoolYear);
+            isGood = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isGood);
+    
+    string semester;
+    int tmpSem;
+    do {
+        cout << "Enter semester (1, 2 or 3): ";
+        getline(cin, semester);
+        isGood = false;
+        try {
+            tmpSem = stoi(semester);
+            isGood = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isGood);
+    string fileName = "courselist/" + schoolYear + to_string(tmpBegin + 1) + "_" + semester + ".dat";
+    ifstream inFile(fileName, ios::binary);
+
+    if (inFile.fail()) {
+        cout << "No data found!!!" << endl;
+    } else {
+        displayCourses();
+        Course tmp;
+        CourseLinkedList *pHead = nullptr;
+        CourseLinkedList *pCur = nullptr;
+        while (!inFile.eof()) {
+            inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+            if (inFile.eof()) break;
+            if (pHead == nullptr) {
+                pHead = new CourseLinkedList;
+                pHead->pPrev = nullptr;
+                pHead->data = tmp;
+                pHead->pNext = nullptr;
+                pCur = pHead;
+            } else {
+                pCur->pNext = new CourseLinkedList;
+                pCur->pNext->pPrev = pCur;
+                pCur = pCur->pNext;
+                pCur->data = tmp;
+                pCur->pNext = nullptr;
+            }
+        }
+        inFile.close();
+        string courseID;
+        cout << "Enter course ID: ";
+        getline(cin, courseID);
+        pCur = pHead;
+        int countDel = 0;
+        while (pCur != nullptr) {
+            if ((pCur->data.courseID).compare(courseID) == 0) {
+                if (pCur == pHead) {
+                    pHead = pHead->pNext;
+                    delete pCur;
+                    pCur = pHead;
+                    if (pCur != nullptr)
+                        pCur->pPrev = nullptr;
+                    countDel++;
+                } else {
+                    pCur->pPrev->pNext = pCur->pNext;
+                    if (pCur->pNext != nullptr) {
+                        pCur->pNext->pPrev = pCur->pPrev;
+                    }
+                    CourseLinkedList *pDel = pCur;
+                    pCur = pCur->pNext;
+                    delete pDel;
+                    countDel++;
+                }
+            }
+            if (pCur != nullptr)
+                pCur = pCur->pNext;
+        }
+
+        ofstream outFile(fileName, ios::binary);
+        pCur = pHead;
+        while (pCur != nullptr) {
+            outFile.write(reinterpret_cast<char *>(&pCur->data), sizeof(pCur->data));
+            pCur = pCur->pNext;
+        }
+        outFile.close();
+
+        if (countDel == 0) {
+            cout << "No course found!!!" << endl;
+        } else
+            cout << "Delete course successfully!!!" << endl;
+
+        pCur = pHead;
+        while (pHead != nullptr) {
+            pCur = pHead;
+            pHead = pHead->pNext;
+            delete pCur;
+        }
+    }
+}
+
 void displayScoreboardOfCourse() {
     string courseID;
     cout << "What course ID of the scoreboard do you want to view? ";
@@ -1128,6 +1538,123 @@ void displayScoreboardOfClass() {
     inClassFile.close();
 }
 
+void addCourseAtBegin() {
+    displayCourses();
+    SchoolYear schoolyear;
+    int semester;
+    bool isChecked;
+    do {
+        isChecked = false;
+        cout << "Enter school year: ";
+        string tmpBeg;
+        getline(cin, tmpBeg);
+        try {
+            schoolyear.begin = stoi(tmpBeg);
+            isChecked = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isChecked);
+
+    do {
+        isChecked = false;
+        cout << "Enter semester: ";
+        string tmpSem;
+        getline(cin, tmpSem);
+        try {
+            semester = stoi(tmpSem);
+            isChecked = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isChecked);
+    ifstream inFile("schoolYear.dat", ios::binary);
+    SchoolYear tmp;
+    bool isFound = false;
+    while(1) {
+        inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+        if (inFile.eof()) break;
+        if (tmp.begin == schoolyear.begin) {
+            schoolyear = tmp;
+            isFound = true;
+            break;
+        }
+    }
+    inFile.close();
+    if (isFound == false) {
+        cout << "No school year founded!!!" << endl;
+    } else if (schoolyear.sems[semester - 1] == false) {
+        cout << "The semester is not added!!!" << endl;
+    } else {
+        addCourse(schoolyear, semester);
+    }
+}
+
+void addCourseRegistrationSessionAtBegin() {
+    ifstream sampleFile("schoolYear.dat", ios::binary);
+    SchoolYear tmpSchoolYear;
+    int count = 0;
+    while (1) {
+        sampleFile.read(reinterpret_cast<char *>(&tmpSchoolYear), sizeof(tmpSchoolYear));
+        if (sampleFile.eof()) break;
+        cout << tmpSchoolYear.begin << " " << tmpSchoolYear.end << endl;
+        count++;
+    }
+    sampleFile.close();
+    if (count == 0) {
+        cout << "There are no school years created!!!" << endl;
+        return;
+    }
+    SchoolYear schoolyear;
+    int semester;
+    bool isChecked;
+    do {
+        isChecked = false;
+        cout << "Enter school year: ";
+        string tmpBeg;
+        getline(cin, tmpBeg);
+        try {
+            schoolyear.begin = stoi(tmpBeg);
+            isChecked = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isChecked);
+
+    do {
+        isChecked = false;
+        cout << "Enter semester: ";
+        string tmpSem;
+        getline(cin, tmpSem);
+        try {
+            semester = stoi(tmpSem);
+            isChecked = true;
+        } catch (...) {
+            cout << "Invalid input" << endl;
+        }
+    } while (!isChecked);
+    ifstream inFile("schoolYear.dat", ios::binary);
+    SchoolYear tmp;
+    bool isFound = false;
+    while(1) {
+        inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+        if (inFile.eof()) break;
+        if (tmp.begin == schoolyear.begin) {
+            schoolyear = tmp;
+            isFound = true;
+            break;
+        }
+    }
+    inFile.close();
+    if (isFound == false) {
+        cout << "No school year founded!!!" << endl;
+    } else if (schoolyear.sems[semester - 1] == false) {
+        cout << "The semester is not added!!!" << endl;
+    } else {
+        addCourseRegistrationSession(schoolyear, semester);
+    }
+}
+
 void staffMenu(bool &isOff) {
     cout << " -------------------- " << endl;
     cout << "|     STAFF MENU     |" << endl;
@@ -1142,20 +1669,22 @@ void staffMenu(bool &isOff) {
     cout << "4. Display list of students in exist classes" << endl;
     cout << "5. Create a semester" << endl;
     cout << "6. View list of courses" << endl;
-    cout << "7" << endl;
-    cout << "8" << endl;
-    cout << "9. View list of student in a course" << endl;
-    cout << "10. Export a list of students in a course to a CSV file" << endl;
-    cout << "11. Import a scoreboard of a course" << endl; 
-    cout << "12. View the scoreboard of a course" << endl;
-    cout << "13. View the scoreboard of a class" << endl;
+    cout << "7. Add course to exist semester" << endl;
+    cout << "8. Update courses information" << endl;
+    cout << "9. Remove a course" << endl;
+    cout << "10. View list of student in a course" << endl;
+    cout << "11. Export a list of students in a course to a CSV file" << endl;
+    cout << "12. Import a scoreboard of a course" << endl; 
+    cout << "13. View the scoreboard of a course" << endl;
+    cout << "14. View the scoreboard of a class" << endl;
+    cout << "15. Add new course registration sessions" << endl;
     
     do {
         cout << "Your choice: ";
-        cin >> choice;
+        getline(cin, choice);
     } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4' && choice[0] != '5' 
-                && choice != "6" && choice != "7" && choice != "8" && choice != "9" && choice == "10" && choice == "11" 
-                && choice == "12" && choice == "13"));
+                && choice != "6" && choice != "7" && choice != "8" && choice != "9" && choice != "10" && choice != "11" 
+                && choice != "12" && choice != "13" && choice != "14") || !_checkSpace(choice));
     // Add function below this;
     if (choice[0] == '0') {
         startMenu(isOff);
@@ -1179,22 +1708,133 @@ void staffMenu(bool &isOff) {
         // Display courses
         displayCourses();
     } else if (choice == "7") {
-
+        // Add new course
+        addCourseAtBegin();
     } else if (choice == "8") {
-    
+        // Update courses infor
+        updateCourseInfor();
     } else if (choice == "9") {
-        displayStudentOfCourse();
+        // Remove course
+        removeCourse();
     } else if (choice == "10") {
-        exportToCsv();
+        displayStudentOfCourse();
     } else if (choice == "11") {
-        importScoreboard();
+        exportToCsv();
     } else if (choice == "12") {
-        displayScoreboardOfCourse();
+        importScoreboard();
     } else if (choice == "13") {
+        displayScoreboardOfCourse();
+    } else if (choice == "14") {
         displayScoreboardOfClass();
+    } else if (choice == "15") {
+        addCourseRegistrationSessionAtBegin();
     }
 
     staffMenu(isOff);
+}
+
+bool _checkCourseRegistrationAvailable() {
+    int year = time(0)/31556926 + 1970;
+    int month = (time(0) % 31556926) / 2629743 + 1;
+    int date = ((time(0) % 31556926) % 2629743) / 86400 + 1;
+    ifstream inFile("sessions.dat", ios::binary);
+    CourseRegistration tmp;
+    CourseRegistrationLinkedList *pHead = nullptr;
+    CourseRegistrationLinkedList *pCur = pHead;
+    while (1) {
+        inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+        if (inFile.eof()) break;
+        if (pHead == nullptr) {
+            pHead = new CourseRegistrationLinkedList;
+            pHead->pPrev = nullptr;
+            pHead->data = tmp;
+            pHead->pNext = nullptr;
+            pCur = pHead;
+        } else {
+            pCur->pNext = new CourseRegistrationLinkedList;
+            pCur->pNext->pPrev = pCur;
+            pCur = pCur->pNext;
+            pCur->data = tmp;
+            pCur->pNext = nullptr;
+        }
+    }
+
+    pCur = pHead;
+
+    while (pCur != nullptr) {
+        if (pCur->data.end.year < year) {
+            if(pCur == pHead) {
+                pHead = pHead->pNext;
+                delete pCur;
+                pCur = pHead;
+                if (pCur != nullptr)
+                    pCur->pPrev = nullptr;
+            } else {
+                pCur->pPrev->pNext = pCur->pNext;
+                if (pCur->pNext != nullptr) {
+                    pCur->pNext->pPrev = pCur->pPrev;
+                }
+                CourseRegistrationLinkedList *pDel = pCur;
+                pCur = pCur->pNext;
+                delete pDel;
+            }
+        } else {
+            if (pCur->data.end.month < month) {
+                if(pCur == pHead) {
+                    pHead = pHead->pNext;
+                    delete pCur;
+                    pCur = pHead;
+                    if (pCur != nullptr)
+                        pCur->pPrev = nullptr;
+                } else {
+                    pCur->pPrev->pNext = pCur->pNext;
+                    if (pCur->pNext != nullptr) {
+                        pCur->pNext->pPrev = pCur->pPrev;
+                    }
+                    CourseRegistrationLinkedList *pDel = pCur;
+                    pCur = pCur->pNext;
+                    delete pDel;
+                }
+            } else {
+                if (pCur->data.end.date < date) {
+                    if(pCur == pHead) {
+                        pHead = pHead->pNext;
+                        delete pCur;
+                        pCur = pHead;
+                        if (pCur != nullptr)
+                            pCur->pPrev = nullptr;
+                    } else {
+                        pCur->pPrev->pNext = pCur->pNext;
+                        if (pCur->pNext != nullptr) {
+                            pCur->pNext->pPrev = pCur->pPrev;
+                        }
+                        CourseRegistrationLinkedList *pDel = pCur;
+                        pCur = pCur->pNext;
+                        delete pDel;
+                    }
+                }
+            }
+        }
+        if (pCur != nullptr)
+            pCur = pCur->pNext;
+    }
+
+    _displayCourseRegistration(pHead);
+    bool res;
+    if (pHead == nullptr) {
+        res = false;
+    } else {
+        res = true;
+    }
+
+    pCur = pHead;
+    while (pHead != nullptr) {
+        pCur = pHead;
+        pHead = pHead->pNext;
+        delete pCur;
+    }
+
+    return res;
 }
 
 void studentMenu(bool &isOff, StudentInfor studentinfor) {
@@ -1202,31 +1842,53 @@ void studentMenu(bool &isOff, StudentInfor studentinfor) {
     cout << "|    STUDENT MENU    |" << endl;
     cout << " -------------------- " << endl;
     string choice;
-    cout << "0. Sign out" << endl;
-    cout << "1. Enroll in a course" << endl;
-    cout << "2. View the list of enrolled courses" << endl;
-    cout << "3. Remove a course from enrolled list" << endl;
-    // Add option here
-    do {
-        cout << "Your choice: ";
-        cin >> choice;
-    } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3') || choice.size() >= 2);
-    // Add function below this;
-    if (choice[0] == '0') {
-        startMenu(isOff);
-        return;
-    } else if (choice[0] == '1') {
-        // Enroll in a course
-        enrollCourse(studentinfor);
-    } else if (choice[0] == '2') {
-        // View the list of enrolled courses
-        displayEnrolledCourses(studentinfor.username);
-    } else if (choice[0] == '3') {
-        // Remove a course from enrolled list
-        removeEnrolledCourse(studentinfor.username);
-    }
+    if (_checkCourseRegistrationAvailable()) {
+        cout << "0. Sign out" << endl;
+        cout << "1. Enroll in a course" << endl;
+        cout << "2. View the list of enrolled courses" << endl;
+        cout << "3. Remove a course from enrolled list" << endl;
+        cout << "4. View a list of course available" << endl;
+        // Add option here
+        do {
+            cout << "Your choice: ";
+            getline(cin, choice);
+        } while ((choice[0] != '0' && choice[0] != '1' && choice[0] != '2' && choice[0] != '3' && choice[0] != '4') || choice.size() >= 2);
+        // Add function below this;
+        if (choice[0] == '0') {
+            startMenu(isOff);
+            return;
+        } else if (choice[0] == '1') {
+            // Enroll in a course
+            enrollCourse(studentinfor);
+        } else if (choice[0] == '2') {
+            // View the list of enrolled courses
+            displayEnrolledCourses(studentinfor.username);
+        } else if (choice[0] == '3') {
+            // Remove a course from enrolled list
+            removeEnrolledCourse(studentinfor.username);
+        } else if (choice[0] == '4') {
+            displayCourses();
+        }
 
-    studentMenu(isOff, studentinfor);
+        studentMenu(isOff, studentinfor);
+    } else {
+        cout << "0. Sign out" << endl;
+        cout << "1. View the list of enrolled courses" << endl;
+        // Add option here
+        do {
+            cout << "Your choice: ";
+            getline(cin, choice);
+        } while ((choice[0] != '0' && choice[0] != '1') || choice.size() >= 2);
+        // Add function below this;
+        if (choice[0] == '0') {
+            startMenu(isOff);
+            return;
+        } else if (choice[0] == '1') {
+            // View the list of enrolled courses
+            displayEnrolledCourses(studentinfor.username);
+        } 
+        studentMenu(isOff, studentinfor);
+    }
 }
 
 void _login(bool &isOff) {

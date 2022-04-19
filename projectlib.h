@@ -9,6 +9,7 @@
 #include <vector>
 #include <sstream>
 #include <iomanip>
+#include <ctime>
 using namespace std;
 
 struct Scoreboard {
@@ -46,6 +47,12 @@ struct CourseRegistration {
     Date end;
 };
 
+struct CourseRegistrationLinkedList {
+    CourseRegistrationLinkedList *pPrev;
+    CourseRegistration data;
+    CourseRegistrationLinkedList *pNext;
+};
+
 struct SchoolYear {
     int begin, end;
     bool sems[3] = {false, false, false};
@@ -64,6 +71,12 @@ struct Course {
     int credits, maxStudent;
     string day1, day2;
     string session1, session2;
+};
+
+struct CourseLinkedList {
+    CourseLinkedList *pPrev;
+    Course data;
+    CourseLinkedList *pNext;
 };
 
 struct Student {
