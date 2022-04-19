@@ -147,13 +147,15 @@ int _findSemesterOfCourse(string courseID) {
     Course tmpCourse;
     ifstream inFile("schoolYear.dat", ios::binary);
     string fileCourseName;
-    if (inFile.fail())
+    if (inFile.fail()) {
+        cout << "fail\n";
         return 0;
+    }
     else { 
         while(!inFile.eof()) {
             inFile.read(reinterpret_cast<char *>(&tmpSchoolyear), sizeof(tmpSchoolyear));
             if (inFile.eof()) break;
-
+            
             for (int i = 1; i <= 3; i++) {
                 fileCourseName = "courselist/" + to_string(tmpSchoolyear.begin) + to_string(tmpSchoolyear.end) + "_" + to_string(i) + ".dat";
                 ifstream inCourseFile(fileCourseName, ios::binary);
@@ -161,7 +163,7 @@ int _findSemesterOfCourse(string courseID) {
                     while (!inCourseFile.eof()) {
                         inCourseFile.read(reinterpret_cast<char *>(&tmpCourse), sizeof(tmpCourse));
                         if (inCourseFile.eof()) break;
-                        
+
                         if (courseID.compare(tmpCourse.courseID) == 0) {
                             inCourseFile.close();
                             return i;
@@ -195,8 +197,17 @@ void createSchoolYear() {
     cout << "|   CREATE SCHOOL YEAR   |" << endl;
     cout << " ------------------------ " << endl;
     SchoolYear x;
-    cout << "Enter year begin: ";
-    cin >> x.begin;
+    while (true) {
+        cout << "Enter year begin: ";
+        string tmp;
+        getline(cin, tmp);
+        if(tmp.size() == 4 && tmp[0] >= '0' && tmp[0] <= '9' && tmp[1] >= '0' && tmp[1] <= '9'
+            && tmp[2] >= '0' && tmp[2] <= '9' && tmp[3] >= '0' && tmp[3] <= '9') {
+                x.begin = atoi(tmp.c_str());
+                break;
+        }
+        else cout << "Invalid input. Try again!\n";
+    }
     x.end = x.begin + 1;
     if (_checkCreatedYear(x.begin)) {
         cout << "School year already existed!" << endl;
@@ -253,8 +264,12 @@ void addStudent() {
     ofstream outFile(fileName, ios::app | ios::binary);
 
     string csvFileName;
-    cout << "Enter the file name: ";
-    cin >> csvFileName;
+    while (true) {
+        cout << "Enter the file name: ";
+        getline(cin, csvFileName);
+        if (_checkSpace(csvFileName)) break;
+        else cout << "Invalid input. Try again!\n";
+    }
     
     string data[1000][7];
     string line, word;
@@ -847,13 +862,22 @@ void enrollCourse(StudentInfor studentinfor) {
     displayCourses();
 
     int schoolyearBegin;
-    cout << "What school year are you studying? (Type begin year only) ";
-    cin >> schoolyearBegin;
+    while (true) {
+        cout << "What school year are you studying? (Type begin year only) ";
+        string tmp;
+        getline(cin, tmp);
+        if(tmp.size() == 4 && tmp[0] >= '0' && tmp[0] <= '9' && tmp[1] >= '0' && tmp[1] <= '9'
+            && tmp[2] >= '0' && tmp[2] <= '9' && tmp[3] >= '0' && tmp[3] <= '9') {
+                schoolyearBegin = atoi(tmp.c_str());
+                break;
+        }
+        else cout << "Invalid input. Try again!\n";
+    }
     
     string semester;
     do {
         cout << "What semester are you studying? (1, 2, 3) ";
-        cin >> semester;
+        getline(cin, semester);
     } while ((semester[0] != '1' && semester[0] != '2' && semester[0] != '3') || semester.size() >= 2);
 
     if (numOfEnrolledCourses(fileStudentName, schoolyearBegin, semester) == 5) {
@@ -868,7 +892,7 @@ void enrollCourse(StudentInfor studentinfor) {
     string courseID;
     do {
         cout << "What course ID do you want to enroll in? ";
-        cin >> courseID;
+        getline(cin, courseID);
         if (_checkCreatedCourse(fileCourseName, courseID)) break;
         else cout << "This course doesn't exist!" << endl;
     } while (true);
@@ -929,7 +953,7 @@ void removeEnrolledCourse(string username) {
     string courseID;
     do {
         cout << "What course ID do you want to remove? ";
-        cin >> courseID;
+        getline(cin, courseID);
         if (_checkCreatedCourse(fileStudentName, courseID)) break;
         else cout << "You haven't enrolled in this course yet!" << endl;
     } while (true);
@@ -1002,12 +1026,26 @@ void exportToCsv() {
 
 void importScoreboard() { // consists of update the result of the students
     string courseID;
-    cout << "What course ID do you want to import the scoreboard? ";
-    cin >> courseID;
+    int semester;
+
+    while (true) {
+        cout << "What course ID do you want to import the scoreboard? ";
+        getline(cin, courseID);
+
+        semester = _findSemesterOfCourse(courseID);
+        if (semester == -1) 
+            cout << "This course doesn't exist. Try again!" << endl;
+        
+        else break;
+    }
 
     string csvFileName;
-    cout << "Enter the file name: ";
-    cin >> csvFileName;
+    while (true) {
+        cout << "Enter the file name: ";
+        getline(cin, csvFileName);
+        if (_checkSpace(csvFileName)) break;
+        else cout << "Invalid input. Try again!\n";
+    }
 
     string data[1000][7];
     string line, word;
@@ -1032,8 +1070,6 @@ void importScoreboard() { // consists of update the result of the students
         file.close();
         return;
     }
-
-    int semester = _findSemesterOfCourse(courseID);
 
     string fileAttendedCourse = "attendedCourse/" + courseID + "_scoreboard.dat";
     ofstream outFile(fileAttendedCourse, ios::binary | ios::app);
@@ -1471,8 +1507,18 @@ void removeCourse() {
 
 void displayScoreboardOfCourse() {
     string courseID;
-    cout << "What course ID of the scoreboard do you want to view? ";
-    cin >> courseID;
+    int semester;
+    
+    while (true) {
+        cout << "What course ID of the scoreboard do you want to view? ";
+        getline(cin, courseID);
+
+        semester = _findSemesterOfCourse(courseID);
+        if (semester == -1) 
+            cout << "This course doesn't exist. Try again!" << endl;
+        
+        else break;
+    }
 
     string fileName = "attendedCourse/" + courseID + "_scoreboard.dat"; 
     ifstream inFile(fileName, ios::binary);
@@ -1495,7 +1541,7 @@ void displayScoreboardOfCourse() {
 void displayScoreboardOfClass() {
     string className;
     cout << "What class of the scoreboard do you want to view? ";
-    cin >> className;
+    getline(cin, className);
 
     string fileClassName = "studentlist/" + className + ".dat";
     ifstream inClassFile(fileClassName, ios::binary);
