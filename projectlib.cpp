@@ -16,7 +16,7 @@ bool _checkSpace(const string &cstr) {
 } 
 
 int _checkLogin(const string &username, const string &password, StudentInfor &studentinfor) {
-    ifstream inFile("staffData.dat", ios::binary);
+    ifstream inFile("dataFile/staffData.dat", ios::binary);
     StaffInfor tmpStaff;
     StudentInfor tmpStudent;
     while (!inFile.eof()) {
@@ -33,7 +33,7 @@ int _checkLogin(const string &username, const string &password, StudentInfor &st
         }
     }
     inFile.close();
-    inFile.open("studentData.dat", ios::binary);
+    inFile.open("dataFile/studentData.dat", ios::binary);
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
         if (username.compare(tmpStudent.username) == 0) {
@@ -59,7 +59,7 @@ bool _checkSignUp(const string &username) {
     StudentInfor tmpStudent;
     ifstream inFile;
 
-    inFile.open("studentData.dat", ios::binary);
+    inFile.open("dataFile/studentData.dat", ios::binary);
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
         if (username.compare(tmpStudent.username) == 0) {
@@ -69,7 +69,7 @@ bool _checkSignUp(const string &username) {
     }
     inFile.close();
 
-    inFile.open("staffData.dat", ios::binary);
+    inFile.open("dataFile/staffData.dat", ios::binary);
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char *>(&tmpStaff), sizeof(tmpStaff));
         if (username.compare(tmpStaff.username) == 0) {
@@ -84,7 +84,7 @@ bool _checkSignUp(const string &username) {
 
 bool _checkCreatedYear(int begin) {
     SchoolYear tmp;
-    ifstream inFile("schoolYear.dat", ios::binary);
+    ifstream inFile("dataFile/schoolYear.dat", ios::binary);
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmp), sizeof(tmp));
         if (begin == tmp.begin) {
@@ -98,7 +98,7 @@ bool _checkCreatedYear(int begin) {
 
 bool _checkCreatedClass(string className) {
     string tmpClass;
-    ifstream inFile("firstYearClasses.dat", ios::binary);
+    ifstream inFile("dataFile/firstYearClasses.dat", ios::binary);
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmpClass), sizeof(tmpClass));
         if (className.compare(tmpClass) == 0) {
@@ -113,11 +113,14 @@ bool _checkCreatedClass(string className) {
 bool _checkCreatedCourse(string fileName, string courseID) {
     ifstream inFile(fileName, ios::binary);
     Course tmpCourse;
-    while (!inFile.eof()) {
-        inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
-        if (courseID.compare(tmpCourse.courseID) == 0) return true;
+    if (inFile.fail())
+        return false;
+    else {
+        while (!inFile.eof()) {
+            inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+            if (courseID.compare(tmpCourse.courseID) == 0) return true;
+        }
     }
-
     return false;
 }
 
@@ -145,7 +148,7 @@ bool _checkConflictedSession(string fileCourseName, string courseID, string file
 int _findSemesterOfCourse(string courseID) {
     SchoolYear tmpSchoolyear;
     Course tmpCourse;
-    ifstream inFile("schoolYear.dat", ios::binary);
+    ifstream inFile("dataFile/schoolYear.dat", ios::binary);
     string fileCourseName;
     if (inFile.fail()) {
         cout << "fail\n";
@@ -214,7 +217,7 @@ void createSchoolYear() {
         return;
     }
 
-    ofstream outFile("schoolYear.dat", ios::app | ios::binary);
+    ofstream outFile("dataFile/schoolYear.dat", ios::app | ios::binary);
     outFile.write(reinterpret_cast<char*>(&x), sizeof(x));
     outFile.close();
 
@@ -226,8 +229,7 @@ void createClass() {
     cout << "|   CREATE 1ST YEAR CLASS   |" << endl;
     cout << " --------------------------- " << endl;
     string className;
-    cout << "Enter class name: \n";
-    cin.ignore(1000, '\n');
+    cout << "Enter class name: ";
     getline(cin, className);
 
     if (_checkCreatedClass(className)) {
@@ -235,7 +237,7 @@ void createClass() {
         return;
     }
 
-    ofstream outFile("firstYearClasses.dat", ios::app | ios::binary);
+    ofstream outFile("dataFile/firstYearClasses.dat", ios::app | ios::binary);
     outFile.write(reinterpret_cast<char*>(&className), sizeof(className));
     outFile.close();
 
@@ -252,11 +254,10 @@ void addStudent() {
 
     string className;
     cout << "Which class do you want to add students to?" << endl;
-    cin.ignore(1000, '\n');
     getline(cin, className);
 
     if (!_checkCreatedClass(className)) {
-        cout << "Class doesn't exist. Enter again!\n";
+        cout << "Class doesn't exist.\n";
         return;
     }
     
@@ -273,6 +274,8 @@ void addStudent() {
     
     string data[1000][7];
     string line, word;
+
+    csvFileName = "importedStudentFile/" + csvFileName;
 
     fstream file(csvFileName, ios::in);
     int n = 0;
@@ -315,7 +318,7 @@ void addStudent() {
 
 void displayList() {
     string classFileName;
-    ifstream inFile("firstYearClasses.dat", ios::binary);
+    ifstream inFile("dataFile/firstYearClasses.dat", ios::binary);
     ifstream studentFile;
     string studentFileName;
     Student tmpStudent;
@@ -377,7 +380,7 @@ bool _checkCourseRegistration(CourseRegistration course) {
 }
 
 void _displayCourseRegistration(CourseRegistrationLinkedList *pHead) {
-    cout << "Course registration sessions created" << endl;
+    cout << "Course registration sessions created::" << endl;
     int count = 0;
     CourseRegistrationLinkedList *pCur = pHead;
     while (pCur != nullptr) {
@@ -389,7 +392,7 @@ void _displayCourseRegistration(CourseRegistrationLinkedList *pHead) {
         pCur = pCur->pNext;
     }
     if (count == 0)
-        cout << "There are no coure registration sessions created";
+        cout << "There are no coure registration sessions created!!!" << endl;
 }
 
 void addCourseRegistrationSession(SchoolYear schoolyear, int semester) {
@@ -414,12 +417,12 @@ void addCourseRegistrationSession(SchoolYear schoolyear, int semester) {
         cout << "Date: ";
         getline(cin, tmpEndDate);
         try {
-            tmp.start.year = stoi(tmpStartYear);
-            tmp.start.month = stoi(tmpStartMonth);
-            tmp.start.date = stoi(tmpStartDate);
-            tmp.end.year = stoi(tmpEndYear);
-            tmp.end.month = stoi(tmpEndMonth);
-            tmp.end.date = stoi(tmpEndDate);
+            tmp.start.year = atoi(tmpStartYear.c_str());
+            tmp.start.month = atoi(tmpStartMonth.c_str());
+            tmp.start.date = atoi(tmpStartDate.c_str());
+            tmp.end.year = atoi(tmpEndYear.c_str());
+            tmp.end.month = atoi(tmpEndMonth.c_str());
+            tmp.end.date = atoi(tmpEndDate.c_str());
             if (_checkCourseRegistration(tmp))
                 inputGood = true;
             else 
@@ -430,7 +433,7 @@ void addCourseRegistrationSession(SchoolYear schoolyear, int semester) {
     } while (!inputGood || !_checkCourseRegistration(tmp));
     tmp.schoolyear = schoolyear.begin;
     tmp.semester = semester;
-    ofstream outFile("sessions.dat", ios::binary | ios::app);
+    ofstream outFile("dataFile/sessions.dat", ios::binary | ios::app);
     outFile.write(reinterpret_cast<char *>(&tmp), sizeof(tmp));
     outFile.close();
 }
@@ -440,6 +443,11 @@ void addCourse(SchoolYear schoolyear, int semester) {
     cout << "Add courses to semester" << endl;
     cout << "Course ID: ";
     getline(cin, tmp.courseID);
+    string fileName = "courselist/" + to_string(schoolyear.begin) + to_string(schoolyear.end) + "_" + to_string(semester) + ".dat";
+    if (_checkCreatedCourse(fileName, tmp.courseID)) {
+        cout << "This course is already added" << endl;
+        return;
+    }
     cout << "Course Name: ";
     getline(cin, tmp.courseName);
     cout << "Teacher Name: ";
@@ -558,36 +566,34 @@ void addCourse(SchoolYear schoolyear, int semester) {
             switch(dayChoice[0]) {
                 case '1':
                     tmp.day2 = "MON";
-                    inputGood = true;
                     break;
                 case '2':
                     tmp.day2 = "TUE";
-                    inputGood = true;
                     break;
                 case '3':
                     tmp.day2 = "WED";
-                    inputGood = true;
                     break;
                 case '4':
                     tmp.day2 = "THU";
-                    inputGood = true;
                     break;
                 case '5':
                     tmp.day2 = "FRI";
-                    inputGood = true;
                     break;
                 case '6':
                     tmp.day2 = "SAT";
-                    inputGood = true;
                     break;
                 case '7':
                     tmp.day2 = "SUN";
-                    inputGood = true;
                     break;
                 default:
                     cout << "Invalid input, input again" << endl;
                     break;
             }
+        }
+        if (tmp.day2.compare(tmp.day1) == 0) {
+            cout << "Your day 2 must different from day 1" << endl;
+        } else {
+            inputGood = true;
         }
     }
     
@@ -624,10 +630,14 @@ void addCourse(SchoolYear schoolyear, int semester) {
     }
     tmp.schoolyearBegin = schoolyear.begin;
     tmp.semester = semester;
-    string fileName;
+    
     fileName = "courselist/" + to_string(schoolyear.begin) + to_string(schoolyear.end) + "_" + to_string(semester) + ".dat";
     ofstream outFile(fileName, ios::binary | ios::app);
     outFile.write(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+    outFile.close();
+
+    fileName = "attendedCourse/" + tmp.courseID + ".dat";
+    outFile.open(fileName, ios::binary);
     outFile.close();
 }
 
@@ -637,7 +647,7 @@ void createSemester() {
     SchoolYearLinkedList *pRead = pHead;
     SchoolYearLinkedList *pNew = nullptr;
     SchoolYear tmp;
-    ifstream inFile("schoolYear.dat", ios::binary);
+    ifstream inFile("dataFile/schoolYear.dat", ios::binary);
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
         if (inFile.eof())
@@ -675,7 +685,7 @@ void createSemester() {
     while(!inputGood) {
         try {
             cout << "Choose your school years (Type begin year only): ";
-            cin >> choiceStr;
+            getline(cin, choiceStr);
             choice = stoi(choiceStr);
             inputGood = true;
         } catch (...) {
@@ -695,7 +705,7 @@ void createSemester() {
         cout << "What semester do you want to create 1, 2 or 3: ";
         string semChoice;
         do {
-            cin >> semChoice;
+            getline(cin, semChoice);
         } while (semChoice[0] != '1' && semChoice[0] != '2' && semChoice[0] != '3' || semChoice.size() >= 2); 
 
         bool checkEmptySem = false;
@@ -704,37 +714,34 @@ void createSemester() {
                 if (theChosen->data.sems[0] == true) {
                     cout << "It is already created" << endl;
                     cout << "What semester do you want to create 1, 2 or 3: ";
-                    cin >> semChoice;
+                    getline(cin, semChoice);
                 }
                 else {
                     checkEmptySem = true;
                     theChosen->data.sems[0] = true;
                     addCourseRegistrationSession(theChosen->data, 1);
-                    addCourse(theChosen->data, 1);
                 }
             } else if (semChoice[0] == '2') {                
                 if (theChosen->data.sems[1] == true) {
                     cout << "It is already created" << endl;
                     cout << "What semester do you want to create 1, 2 or 3: ";
-                    cin >> semChoice;
+                    getline(cin, semChoice);
                 }
                 else {
                     checkEmptySem = true;
                     theChosen->data.sems[1] = true;
                     addCourseRegistrationSession(theChosen->data, 2);
-                    addCourse(theChosen->data, 2);
                 }
             } else {
                 if (theChosen->data.sems[2] == true) {
                     cout << "It is already created" << endl;
                     cout << "What semester do you want to create 1, 2 or 3: ";
-                    cin >> semChoice;
+                    getline(cin, semChoice);
                 }
                 else {
                     checkEmptySem = true;
                     theChosen->data.sems[2] = true;
                     addCourseRegistrationSession(theChosen->data, 3);
-                    addCourse(theChosen->data, 3);
                 }
             }
         }
@@ -742,7 +749,7 @@ void createSemester() {
     }
     inFile.close();
     
-    ofstream outFile("schoolYear.dat", ios::binary | ios::out);
+    ofstream outFile("dataFile/schoolYear.dat", ios::binary | ios::out);
     pRead = pHead;
     while (pRead != nullptr) {
         outFile.write(reinterpret_cast<char *>(&pRead->data), sizeof(pRead->data));
@@ -761,7 +768,7 @@ void createSemester() {
 void displayCourses() {
     SchoolYear tmpSchoolyear;
     Course tmpCourse;
-    ifstream inFile("schoolYear.dat", ios::binary);
+    ifstream inFile("dataFile/schoolYear.dat", ios::binary);
     int count = 0;
     string fileCourseName;
     cout << "List of courses" << endl;
@@ -839,19 +846,22 @@ void displayStudentOfCourse() {
     displayCourses();
     cout << "Enter course ID: ";
     string courseID;
-    cin.ignore();
     getline(cin, courseID);
     string fileName = "attendedCourse/" + courseID + ".dat"; 
     ifstream inFile(fileName, ios::binary);
     if (inFile.fail()) {
-        cout << "No students enroll this course" << endl;
+        cout << "The course is not created" << endl;
     } else {
         StudentInfor studentinfor;
+        int tmpCount = 0;
         while (!inFile.eof()) {
             inFile.read(reinterpret_cast<char *>(&studentinfor), sizeof(studentinfor));
             if (inFile.eof()) break;
             cout << studentinfor.fullName << endl;
+            tmpCount++;
         }
+        if (tmpCount == 0)
+            cout << "No student attend this course" << endl;
     }
     inFile.close();
 }
@@ -880,6 +890,21 @@ void enrollCourse(StudentInfor studentinfor) {
         getline(cin, semester);
     } while ((semester[0] != '1' && semester[0] != '2' && semester[0] != '3') || semester.size() >= 2);
 
+    ifstream inFile("dataFile/sessions.dat", ios::binary);
+    CourseRegistration tmp;
+    int tmpCount = 0;
+    while (true) {
+        inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+        if (inFile.eof()) break;
+        if (tmp.schoolyear == schoolyearBegin && to_string(tmp.semester).compare(semester) == 0)
+            tmpCount++;
+    }
+
+    if (tmpCount == 0) {
+        cout << "The registration sessions of this semester is over!!!" << endl;
+        return;
+    }
+
     if (numOfEnrolledCourses(fileStudentName, schoolyearBegin, semester) == 5) {
         cout << "You have enrolled in 5 courses in this semester. You can't enroll in anymore!" << endl;
         return;
@@ -894,7 +919,10 @@ void enrollCourse(StudentInfor studentinfor) {
         cout << "What course ID do you want to enroll in? ";
         getline(cin, courseID);
         if (_checkCreatedCourse(fileCourseName, courseID)) break;
-        else cout << "This course doesn't exist!" << endl;
+        else {
+            cout << "This course doesn't exist!" << endl;
+            return;
+        } 
     } while (true);
 
     if (!_checkConflictedSession(fileCourseName, courseID, fileStudentName)) {
@@ -927,20 +955,50 @@ void displayEnrolledCourses(string username) {
 
     ifstream inFile(fileStudentName, ios::binary);
     Course tmpCourse;
+    int count = 0;
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
         if (inFile.eof()) break;
         cout << "\t";
-        cout << tmpCourse.courseID << " ";
-        cout << tmpCourse.courseName << " ";
-        cout << tmpCourse.teacherName << " ";
-        cout << tmpCourse.maxStudent << " ";
-        cout << tmpCourse.credits << " ";
-        cout << tmpCourse.day1 << " ";
-        cout << tmpCourse.session1 << " ";
-        cout << tmpCourse.day2 << " ";
+        cout << setw(12) << left << "Course ID";
+        cout << " | ";
+        cout << setw(25) << left << "Course Name";
+        cout << " | ";
+        cout << setw(20) << left << "Teacher Name";
+        cout << " | ";
+        cout << setw(20) << left << "Number of students";
+        cout << " | ";
+        cout << setw(20) << left << "Number of credits";
+        cout << " | ";
+        cout << setw(5) << left << "Day 1";
+        cout << " | ";
+        cout << setw(10) << left << "Session I";
+        cout << " | ";
+        cout << setw(5) << left << "Day 2";
+        cout << " | ";
+        cout << "Session II" << endl;
+        cout << "\t";
+        cout << setw(12) << left << tmpCourse.courseID;
+        cout << " | ";
+        cout << setw(25) << left << tmpCourse.courseName;
+        cout << " | ";
+        cout << setw(20) << left << tmpCourse.teacherName;
+        cout << " | ";
+        cout << setw(20) << left << tmpCourse.maxStudent;
+        cout << " | ";
+        cout << setw(20) << left << tmpCourse.credits;
+        cout << " | ";
+        cout << setw(5) << left << tmpCourse.day1;
+        cout << " | ";
+        cout << setw(10) << left << tmpCourse.session1;
+        cout << " | ";
+        cout << setw(5) << left << tmpCourse.day2;
+        cout << " | ";
         cout << tmpCourse.session2 << endl;
+        count++;
     }
+    if (count == 0)
+        cout << "You have not enrolled any courses!!!" << endl;
 }
 
 void removeEnrolledCourse(string username) {
@@ -955,7 +1013,10 @@ void removeEnrolledCourse(string username) {
         cout << "What course ID do you want to remove? ";
         getline(cin, courseID);
         if (_checkCreatedCourse(fileStudentName, courseID)) break;
-        else cout << "You haven't enrolled in this course yet!" << endl;
+        else {
+            cout << "You haven't enrolled in this course yet!" << endl;
+            return;
+        } 
     } while (true);
 
     string tmpFileName = "studentfile/tmpfile.dat";
@@ -979,7 +1040,7 @@ void removeEnrolledCourse(string username) {
 }
 
 void exportToCsv() {
-    ifstream inYearFile("schoolYear.dat", ios::binary);
+    ifstream inYearFile("dataFile/schoolYear.dat", ios::binary);
     SchoolYear tmpSchoolyear;
     string fileCourseName;
     string attendedCourse;
@@ -1001,7 +1062,7 @@ void exportToCsv() {
                     ifstream inAttendedCourseFile(attendedCourse, ios::binary);
                     if (inAttendedCourseFile.fail()) continue;
 
-                    string courseName = tmpCourse.courseID + ".csv";
+                    string courseName = "exportedFile/" + tmpCourse.courseID + ".csv";
                     ofstream outFile(courseName, ios::out | ios::app);
 
                     while (!inAttendedCourseFile.eof()) {
@@ -1033,9 +1094,10 @@ void importScoreboard() { // consists of update the result of the students
         getline(cin, courseID);
 
         semester = _findSemesterOfCourse(courseID);
-        if (semester == -1) 
-            cout << "This course doesn't exist. Try again!" << endl;
-        
+        if (semester == -1) {
+            cout << "This course doesn't exist." << endl;
+            return;
+        }
         else break;
     }
 
@@ -1049,6 +1111,8 @@ void importScoreboard() { // consists of update the result of the students
 
     string data[1000][7];
     string line, word;
+
+    csvFileName = "scoreboardCsv/" + csvFileName;
 
     fstream file(csvFileName, ios::in);
     int n = 0;
@@ -1089,7 +1153,7 @@ void importScoreboard() { // consists of update the result of the students
         outFile.write(reinterpret_cast<char*>(&tmp), sizeof(tmp));
 
         // Update result of this student:
-        string fileStudentDataName = "studentData.dat";
+        string fileStudentDataName = "dataFile/studentData.dat";
         string tmpFileName = "tmpfile.dat";
         ofstream outTmpFile(tmpFileName, ios::binary | ios::app);
         ifstream inStudentFile(fileStudentDataName, ios::binary);
@@ -1155,7 +1219,7 @@ void updateCourseInfor() {
     ifstream inFile(fileName, ios::binary);
 
     if (inFile.fail()) {
-        cout << "No data found!!!" << endl;
+        cout << "The school year or semester is not created!!!" << endl;
     } else {
         displayCourses();
         Course tmp;
@@ -1304,36 +1368,35 @@ void updateCourseInfor() {
                         switch(dayChoice[0]) {
                             case '1':
                                 modifiedCourse.day2 = "MON";
-                                isCheck = true;
                                 break;
                             case '2':
                                 modifiedCourse.day2 = "TUE";
-                                isCheck = true;
                                 break;
                             case '3':
                                 modifiedCourse.day2 = "WED";
-                                isCheck = true;
                                 break;
                             case '4':
                                 modifiedCourse.day2 = "THU";
-                                isCheck = true;
                                 break;
                             case '5':
                                 modifiedCourse.day2 = "FRI";
-                                isCheck = true;
                                 break;
                             case '6':
                                 modifiedCourse.day2 = "SAT";
-                                isCheck = true;
                                 break;
                             case '7':
                                 modifiedCourse.day2 = "SUN";
-                                isCheck = true;
                                 break;
                             default:
                                 cout << "Invalid input, input again" << endl;
                                 break;
                         }
+                    }
+
+                    if (modifiedCourse.day2.compare(modifiedCourse.day1) == 0) {
+                        cout << "The day 2 must different from day 1" << endl;
+                    } else {
+                        isCheck = true;
                     }
                 }
             
@@ -1493,9 +1556,12 @@ void removeCourse() {
 
         if (countDel == 0) {
             cout << "No course found!!!" << endl;
-        } else
+        } else {
             cout << "Delete course successfully!!!" << endl;
-
+            string fileToDel = "attendedCourse/" + courseID + ".dat";
+            remove(fileToDel.c_str());
+        }
+            
         pCur = pHead;
         while (pHead != nullptr) {
             pCur = pHead;
@@ -1514,8 +1580,10 @@ void displayScoreboardOfCourse() {
         getline(cin, courseID);
 
         semester = _findSemesterOfCourse(courseID);
-        if (semester == -1) 
-            cout << "This course doesn't exist. Try again!" << endl;
+        if (semester == -1) {
+            cout << "This course doesn't exist" << endl;
+            return;
+        }
         
         else break;
     }
@@ -1559,7 +1627,7 @@ void displayScoreboardOfClass() {
 
         string studentID = student.StudentID;
         
-        ifstream inStudentFile("studentData.dat", ios::binary);
+        ifstream inStudentFile("dataFile/studentData.dat", ios::binary);
         while (!inStudentFile.eof()) {
             StudentInfor studentinfor;
             inStudentFile.read(reinterpret_cast<char*>(&studentinfor), sizeof(studentinfor));
@@ -1614,7 +1682,7 @@ void addCourseAtBegin() {
             cout << "Invalid input" << endl;
         }
     } while (!isChecked);
-    ifstream inFile("schoolYear.dat", ios::binary);
+    ifstream inFile("dataFile/schoolYear.dat", ios::binary);
     SchoolYear tmp;
     bool isFound = false;
     while(1) {
@@ -1637,7 +1705,7 @@ void addCourseAtBegin() {
 }
 
 void addCourseRegistrationSessionAtBegin() {
-    ifstream sampleFile("schoolYear.dat", ios::binary);
+    ifstream sampleFile("dataFile/schoolYear.dat", ios::binary);
     SchoolYear tmpSchoolYear;
     int count = 0;
     while (1) {
@@ -1679,7 +1747,7 @@ void addCourseRegistrationSessionAtBegin() {
             cout << "Invalid input" << endl;
         }
     } while (!isChecked);
-    ifstream inFile("schoolYear.dat", ios::binary);
+    ifstream inFile("dataFile/schoolYear.dat", ios::binary);
     SchoolYear tmp;
     bool isFound = false;
     while(1) {
@@ -1783,7 +1851,7 @@ bool _checkCourseRegistrationAvailable() {
     int year = time(0)/31556926 + 1970;
     int month = (time(0) % 31556926) / 2629743 + 1;
     int date = ((time(0) % 31556926) % 2629743) / 86400 + 1;
-    ifstream inFile("sessions.dat", ios::binary);
+    ifstream inFile("dataFile/sessions.dat", ios::binary);
     CourseRegistration tmp;
     CourseRegistrationLinkedList *pHead = nullptr;
     CourseRegistrationLinkedList *pCur = pHead;
@@ -2001,7 +2069,7 @@ void _signUp() {
             staff.username = username;
             staff.password = password;
             staff.fullName = fullname;
-            ofstream outFile("staffData.dat", ios::binary | ios::app);
+            ofstream outFile("dataFile/staffData.dat", ios::binary | ios::app);
             outFile.write(reinterpret_cast<char *>(&staff), sizeof(staff));
             outFile.close();
         } 
@@ -2017,7 +2085,7 @@ void _signUp() {
                 student.semesterGPA[i] = 0;
             student.overallGPA = 0;
 
-            ofstream outFile("studentData.dat", ios::app);
+            ofstream outFile("dataFile/studentData.dat", ios::app);
             outFile.write(reinterpret_cast<char *>(&student), sizeof(student));
             outFile.close();
 
