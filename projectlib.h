@@ -13,25 +13,31 @@
 using namespace std;
 
 struct Scoreboard {
-    string courseID;
-    string No, StudentID, FullName;
+    string courseID, StudentID, FullName;
     double TotalMark, FinalMark, MidtermMark, OtherMark;
 };
 
+struct StudentGPA {
+    double GPA1 = -1;
+    double GPA2 = -1;
+    double GPA3 = -1;
+};
+
 struct StudentInfor {
-    string username;
-    string password;
-    string fullName;
-    string studentID;
-    int numOfCourse;
-    Scoreboard score[100];
-    double semesterGPA[4], overallGPA;
+    string no, studentID, fullName, gender, DoB, socialID, password;
+};
+
+struct StudentInforLinkedList {
+    StudentInforLinkedList *pPrev;
+    StudentInfor data;
+    StudentInforLinkedList *pNext;
 };
 
 struct StaffInfor {
     string username;
     string password;
     string fullName;
+    string title;
 };
 
 struct Date {
@@ -79,15 +85,7 @@ struct CourseLinkedList {
     CourseLinkedList *pNext;
 };
 
-struct Student {
-    string No, StudentID, FName, LName, Gender, DoB, SocialID;
-};
 
-
-struct StudentLinkedList {
-    Student data;
-    StudentLinkedList* pNext, *pPrev;
-};
 
 void createSchoolYear();
 void createClass();
