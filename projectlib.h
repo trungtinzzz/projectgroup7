@@ -49,7 +49,6 @@ struct Date {
 struct CourseRegistration {
     int schoolyear;
     int semester;
-    Date start;
     Date end;
 };
 

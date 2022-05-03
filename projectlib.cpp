@@ -20,8 +20,14 @@ int _checkLoginForStaff(const string &username, const string &password) {
     ifstream inFile(fileName, ios::binary);
     StaffInfor tmpStaff;
 
+    if (inFile.fail()) {
+        inFile.close();
+        return -2;
+    }
+
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char *>(&tmpStaff), sizeof(tmpStaff));
+        if (inFile.eof()) break;
         if (username.compare(tmpStaff.username) == 0) {
             if (password.compare(tmpStaff.password) == 0) {
                 inFile.close();
@@ -51,6 +57,7 @@ int _checkLoginForStudent(const string &username, const string &password, Studen
     }
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char *>(&tmpStudent), sizeof(tmpStudent));
+        if (inFile.eof()) break;
         if (username.compare(tmpStudent.studentID) == 0) {
             if (password.compare(tmpStudent.password) == 0) {
                 studentinfor = tmpStudent;
@@ -63,6 +70,8 @@ int _checkLoginForStudent(const string &username, const string &password, Studen
             }
         }
     }
+    inFile.close();
+
     return -2;
 }
 
@@ -401,15 +410,8 @@ bool _checkAlreadyCreatedYear(SchoolYearLinkedList *pHead, int begin, SchoolYear
 }
 
 bool _checkCourseRegistration(CourseRegistration course) {
-    if (course.start.year > course.end.year || course.start.year <= 0 || course.end.year <= 0) {
+    if (course.end.year <= 0 || course.end.month <= 0 || course.end.date <=0) {
         return false;
-    } else if (course.start.year == course.end.year) {
-        if (course.start.month > course.end.month || course.start.month <=0 || course.end.month <= 0)
-            return false;
-        else if (course.start.month == course.end.month){
-            if (course.start.date > course.end.date || course.start.date <=0 || course.end.date <=0) 
-                return false;
-        }
     } 
     return true;
 }
@@ -421,7 +423,7 @@ void _displayCourseRegistration(CourseRegistrationLinkedList *pHead) {
     while (pCur != nullptr) {
         cout << pCur->data.schoolyear << " " << pCur->data.schoolyear + 1 << endl;
         cout << "\tSemester " << pCur->data.semester << endl;
-        cout << "\t\t" << pCur->data.start.year << "/" << pCur->data.start.month << "/" << pCur->data.start.date << " - ";
+        cout << "\tEnd Date: "; 
         cout << pCur->data.end.year << "/" << pCur->data.end.month << "/" << pCur->data.end.date << endl;
         count++;
         pCur = pCur->pNext;
@@ -436,14 +438,6 @@ void addCourseRegistrationSession(SchoolYear schoolyear, int semester) {
     bool inputGood = false;
     cout << "Add course registration session" << endl;
     do {
-        cout << "Start" << endl;
-        cout << "Year: ";
-        getline(cin, tmpStartYear);
-        cout << "Month: ";
-        getline(cin, tmpStartMonth);
-        cout << "Date: ";
-        getline(cin, tmpStartDate);
-        cout << "----------" << endl;
         cout << "End" << endl;
         cout << "Year: ";
         getline(cin, tmpEndYear);
@@ -452,16 +446,13 @@ void addCourseRegistrationSession(SchoolYear schoolyear, int semester) {
         cout << "Date: ";
         getline(cin, tmpEndDate);
         try {
-            tmp.start.year = atoi(tmpStartYear.c_str());
-            tmp.start.month = atoi(tmpStartMonth.c_str());
-            tmp.start.date = atoi(tmpStartDate.c_str());
             tmp.end.year = atoi(tmpEndYear.c_str());
             tmp.end.month = atoi(tmpEndMonth.c_str());
             tmp.end.date = atoi(tmpEndDate.c_str());
             if (_checkCourseRegistration(tmp))
                 inputGood = true;
             else 
-                cout << "Invalid input (End date must later than start date)" << endl;
+                cout << "Invalid input" << endl;
         } catch (...) {
             cout << "Invalid input" << endl;
         }
@@ -1165,7 +1156,7 @@ void exportToCsv() {
     } else {
         string exportFile = "exportedFile/" + courseName + ".csv";
         ofstream outFile(exportFile);
-        outFile << "StudentID, FullName, Total Mark, Final Mark, Midterm Mark, Other Mark" << endl;
+        outFile << "StudentID,FullName,Total Mark,Final Mark,Midterm Mark,Other Mark" << endl;
         StudentInfor tmp;
         while (true) {
             inFile.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
@@ -1306,7 +1297,7 @@ void importScoreboard() { // consists of update the result of the students
     }
 
     string fileAttendedCourse = "attendedCourse/" + courseID + "_scoreboard.dat";
-    ofstream outFile(fileAttendedCourse, ios::binary | ios::app);
+    ofstream outFile(fileAttendedCourse, ios::binary);
 
 
     for(int i = 0; i < n; i++) {
