@@ -210,6 +210,7 @@ int numOfEnrolledCourses(string fileStudentName, int schoolyearBegin, string sem
         return count;
     while (!inFile.eof()) {
         inFile.read(reinterpret_cast<char*>(&tmpCourse), sizeof(tmpCourse));
+        if (inFile.eof()) break;
         if (tmpCourse.schoolyearBegin == schoolyearBegin && tmpCourse.semester == semester[0] - '0') 
             count++;
     }
@@ -1144,7 +1145,8 @@ void removeEnrolledCourse(string username) {
 }
 
 void exportToCsv() {
-    cout << "Course Name: ";
+    displayCourses();
+    cout << "Course ID: ";
     string courseName;
     getline(cin, courseName);
     string fileName = "attendedCourse/" + courseName + ".dat";
@@ -1238,6 +1240,7 @@ void importScoreboard() { // consists of update the result of the students
     string schoolyear;
     string semester;
     bool inputGood;
+    displayCourses();
     do {
         inputGood = false;
         cout << "Enter school year (begin year only): ";
@@ -1780,7 +1783,7 @@ void displayScoreboardOfClass() {
                     while (true) {
                         inFile.read(reinterpret_cast<char *>(&tmpScoreboard), sizeof(tmpScoreboard));
                         if (inFile.eof()) break;
-                        if (tmpScoreboard.StudentID.compare(student.studentID)) {
+                        if (tmpScoreboard.StudentID.compare(student.studentID) == 0) {
                             cout << "Final Mark: " <<  tmpScoreboard.FinalMark;
                         }
                     }
